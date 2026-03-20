@@ -21,15 +21,17 @@
     <line x1="70" y1="266" x2="570" y2="266"/>
   </g>
 
-  <rect x="72" y="70" width="690" height="178" rx="18" fill="#020617" fill-opacity="0.72" stroke="#475569"/>
-  <text x="104" y="132" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="700">
-    Autonomous Retail Shrinkage Agent
+  <rect x="72" y="58" width="710" height="200" rx="18" fill="#020617" fill-opacity="0.72" stroke="#475569"/>
+  <text x="104" y="116" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700">
+    <tspan x="104" dy="0">Autonomous Retail Loss Prevention</tspan>
+    <tspan x="104" dy="46">Intelligence Platform</tspan>
   </text>
-  <text x="104" y="176" fill="#A5F3FC" font-family="Segoe UI, Arial, sans-serif" font-size="24">
-    Vision + POS Intelligence for Real-Time Incident Response
+  <text x="104" y="206" fill="#A5F3FC" font-family="Segoe UI, Arial, sans-serif" font-size="21">
+    <tspan x="104" dy="0">Vision + POS + Behavioral Reasoning</tspan>
+    <tspan x="104" dy="30">for Real-Time Incident Decisions</tspan>
   </text>
-  <text x="104" y="212" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">
-    Detect -> Validate -> Clip -> Alert
+  <text x="104" y="252" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="16">
+    Detect -> Validate -> Explain -> Escalate
   </text>
 
   <rect x="810" y="74" width="392" height="136" rx="16" fill="#0F172A" stroke="#22D3EE"/>
