@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -10,9 +11,11 @@ from src.vision.detector import SuspiciousEvent
 from src.vision.pipeline import VisionPipeline
 from src.vision.schemas import ObservationIn, ObservationResponse, SuspiciousEventOut
 
-app = FastAPI(title="Shrinkage Agent Service", version="0.2.0")
+app = FastAPI(title="Retail Loss Prevention Intelligence Platform", version="0.3.0")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 pipeline = VisionPipeline()
 incident_manager = IncidentManager()
+frame_counter: dict[str, int] = {"total": 0}
 static_dir = Path(__file__).resolve().parent / "static"
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
@@ -43,6 +46,7 @@ def _serialize_event(event: SuspiciousEvent | None) -> SuspiciousEventOut | None
 
 @app.post("/vision/observations", response_model=ObservationResponse)
 def ingest_observation(observation: ObservationIn) -> ObservationResponse:
+    frame_counter["total"] += 1
     event = pipeline.ingest_observation(observation)
     if event is not None:
         incident_manager.process_event(event)
@@ -61,7 +65,9 @@ def list_incidents() -> list[dict[str, object]]:
 
 @app.get("/metrics")
 def metrics() -> dict[str, int]:
-    return incident_manager.metrics()
+    base = incident_manager.metrics()
+    base["frames_processed"] = frame_counter["total"]
+    return base
 
 
 @app.post("/demo/run")

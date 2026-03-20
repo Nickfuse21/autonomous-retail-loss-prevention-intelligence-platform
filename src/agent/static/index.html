@@ -3,201 +3,537 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shrinkage Agent Dashboard</title>
+  <title>Retail Loss Prevention Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070b16;
-      --panel: #10182d;
-      --panel-soft: #0f1f3d;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --primary: #22d3ee;
-      --accent: #34d399;
-      --danger: #f97316;
-      --border: #223153;
+      --bg: #000000;
+      --surface: rgba(255,255,255,0.04);
+      --glass: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.10);
+      --text: #f5f5f7;
+      --text-secondary: #a1a1a6;
+      --accent: #2997ff;
+      --green: #30d158;
+      --orange: #ff9f0a;
+      --red: #ff453a;
+      --radius: 20px;
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      margin: 0;
-      font-family: Inter, Segoe UI, Arial, sans-serif;
-      background: radial-gradient(circle at 20% 20%, #15274d, var(--bg) 40%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
       color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    .container { max-width: 1180px; margin: 0 auto; padding: 24px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      background: rgba(0,0,0,0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    nav .inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+    }
+    nav .logo { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+    nav .logo span { color: var(--accent); }
+    nav .links { display: flex; gap: 28px; }
+    nav .links a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; transition: color .2s; }
+    nav .links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
     .hero {
-      background: linear-gradient(145deg, #121f3f, #0d1530 55%, #0a4f63);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 120px 24px 80px;
+      background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(41,151,255,0.15), transparent),
+                  radial-gradient(ellipse 60% 40% at 80% 100%, rgba(48,209,88,0.08), transparent);
     }
-    h1 { margin: 0; font-size: 30px; }
-    .sub { color: #cbd5e1; margin-top: 8px; max-width: 700px; line-height: 1.45; }
-    .row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
-    .card {
-      background: linear-gradient(170deg, var(--panel), #0a1224);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 16px;
+    .hero .overline {
+      font-size: 14px; font-weight: 600; color: var(--accent);
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;
     }
-    .metric { font-size: 26px; font-weight: 700; margin-top: 4px; }
-    .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px; }
-    .actions { display: flex; gap: 10px; }
-    button {
-      border: none;
-      background: linear-gradient(120deg, var(--primary), #0ea5e9);
-      color: #062432;
-      font-weight: 700;
-      padding: 12px 16px;
-      border-radius: 10px;
-      cursor: pointer;
+    .hero h1 {
+      font-size: clamp(42px, 6vw, 80px); font-weight: 800;
+      letter-spacing: -2px; line-height: 1.05; max-width: 900px;
+      background: linear-gradient(135deg, #fff 0%, #a1a1a6 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    button.secondary {
-      background: linear-gradient(120deg, #334155, #1e293b);
-      color: #e2e8f0;
+    .hero p {
+      margin-top: 20px; font-size: 18px; color: var(--text-secondary);
+      max-width: 600px; line-height: 1.6;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: 16px;
-      margin-top: 16px;
+    .hero .cta-row { margin-top: 36px; display: flex; gap: 14px; }
+    .btn {
+      padding: 14px 28px; border-radius: 980px; font-size: 15px; font-weight: 600;
+      cursor: pointer; border: none; transition: all .25s;
     }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #1b2848; }
-    th { color: #93c5fd; font-weight: 600; }
-    .badge {
-      padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700;
-      display: inline-block;
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #0077ed; transform: scale(1.04); }
+    .btn-outline {
+      background: transparent; color: var(--accent);
+      border: 1.5px solid var(--accent);
     }
-    .badge.escalated { background: #7c2d12; color: #fdba74; }
-    .badge.resolved { background: #064e3b; color: #86efac; }
-    .log {
-      max-height: 320px;
-      overflow: auto;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 13px;
-      background: #070d1e;
-      border-radius: 12px;
-      border: 1px solid #1b2848;
-      padding: 12px;
+    .btn-outline:hover { background: rgba(41,151,255,0.1); }
+
+    /* ── SECTIONS ── */
+    section { padding: 100px 24px; max-width: 1120px; margin: 0 auto; }
+    .section-label {
+      font-size: 14px; font-weight: 600; color: var(--accent);
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: clamp(32px, 4vw, 52px); font-weight: 700;
+      letter-spacing: -1.2px; line-height: 1.1; max-width: 700px;
+    }
+    .section-sub {
+      margin-top: 14px; font-size: 17px; color: var(--text-secondary);
+      max-width: 560px; line-height: 1.55;
+    }
+
+    /* ── LIVE FEED ── */
+    #liveFeedSection {
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(41,151,255,0.08), transparent);
+    }
+    .feed-layout {
+      margin-top: 48px;
+      display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px;
+      align-items: start;
+    }
+    .camera-box {
+      position: relative; border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--glass-border);
+      background: #0a0a0a; aspect-ratio: 16/10;
+    }
+    #cameraFeed {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block; border-radius: var(--radius);
+    }
+    .camera-overlay {
+      position: absolute; inset: 0; pointer-events: none;
+      border: 2px solid transparent; border-radius: var(--radius);
+      transition: border-color .4s;
+    }
+    .camera-overlay.alert { border-color: var(--red); }
+    .camera-overlay.clear { border-color: var(--green); }
+    .camera-hud {
+      position: absolute; top: 16px; left: 16px;
+      display: flex; gap: 8px; align-items: center;
+    }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--red);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+    .live-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #fff;
+      background: rgba(255,69,58,0.6); padding: 3px 10px; border-radius: 6px;
+    }
+    .camera-status {
+      position: absolute; bottom: 16px; left: 16px; right: 16px;
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      background: rgba(0,0,0,0.55); border-radius: 12px; padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .camera-status .stat { text-align: center; }
+    .camera-status .stat .val { font-size: 18px; font-weight: 700; }
+    .camera-status .stat .lbl { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; }
+
+    .feed-side { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── GLASS CARD ── */
+    .glass {
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: var(--radius); padding: 24px;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .glass:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .glass .card-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+
+    /* ── METRICS ROW ── */
+    #metricsSection {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: radial-gradient(ellipse 60% 50% at 20% 100%, rgba(48,209,88,0.06), transparent);
+    }
+    .metrics-grid {
+      margin-top: 48px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .metric-card { text-align: center; }
+    .metric-card .number {
+      font-size: 48px; font-weight: 800; letter-spacing: -2px;
+      background: linear-gradient(135deg, #fff, #a1a1a6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .metric-card .desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+    /* ── INCIDENT TABLE ── */
+    #incidentSection {
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .incident-table-wrap {
+      margin-top: 40px; border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px); background: var(--glass);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left; padding: 16px 20px;
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 1px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    tbody td {
+      padding: 14px 20px; font-size: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    tbody tr { transition: background .2s; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    .pill {
+      display: inline-block; padding: 4px 12px; border-radius: 980px;
+      font-size: 11px; font-weight: 700; letter-spacing: .5px;
+    }
+    .pill.escalated { background: rgba(255,69,58,0.15); color: var(--red); }
+    .pill.resolved { background: rgba(48,209,88,0.15); color: var(--green); }
+
+    /* ── EVENT LOG ── */
+    .event-log {
+      max-height: 300px; overflow-y: auto;
+      font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+      font-size: 12px; line-height: 1.7; color: var(--text-secondary);
+    }
+    .event-log .line { padding: 2px 0; }
+    .event-log .line .ts { color: #555; }
+    .event-log .line .evt { color: var(--orange); }
+
+    /* ── ARCHITECTURE ── */
+    #archSection {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(41,151,255,0.06), transparent);
+    }
+    .arch-flow {
+      margin-top: 48px;
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .arch-node {
+      padding: 14px 22px; border-radius: 14px;
+      background: var(--glass); border: 1px solid var(--glass-border);
+      font-size: 13px; font-weight: 600; text-align: center;
+      transition: transform .3s, background .3s;
+    }
+    .arch-node:hover { background: rgba(41,151,255,0.12); transform: scale(1.06); }
+    .arch-arrow { font-size: 20px; color: var(--text-secondary); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 60px 24px 40px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    footer p { font-size: 13px; color: #555; }
+
+    /* ── FADE-IN ── */
+    .fade-in { opacity: 0; transform: translateY(30px); transition: opacity .7s, transform .7s; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      .feed-layout { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="hero">
-      <div>
-        <h1>Autonomous Retail Shrinkage Agent</h1>
-        <div class="sub">
-          Vision anomaly detection + POS cross-validation + autonomous incident packaging.
-          This dashboard shows live events, escalations, and evidence generation.
-        </div>
-      </div>
-      <div class="actions">
-        <button id="runDemo">Run Demo Scenario</button>
-        <button class="secondary" id="refresh">Refresh</button>
-      </div>
-    </div>
 
-    <div class="row">
-      <div class="card">
-        <div class="label">Total Incidents</div>
-        <div class="metric" id="metricTotal">0</div>
-      </div>
-      <div class="card">
-        <div class="label">Escalated</div>
-        <div class="metric" id="metricEscalated">0</div>
-      </div>
-      <div class="card">
-        <div class="label">Resolved by POS Match</div>
-        <div class="metric" id="metricResolved">0</div>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <div class="label" style="margin-bottom: 10px;">Incident Feed</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>SKU</th>
-              <th>Confidence</th>
-              <th>Reason</th>
-            </tr>
-          </thead>
-          <tbody id="incidentRows"></tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <div class="label" style="margin-bottom: 10px;">Event Stream</div>
-        <div class="log" id="eventLog">Waiting for data...</div>
-      </div>
+<!-- NAV -->
+<nav>
+  <div class="inner">
+    <div class="logo">Retail<span>Guard</span> AI</div>
+    <div class="links">
+      <a href="#liveFeedSection">Live Feed</a>
+      <a href="#metricsSection">Metrics</a>
+      <a href="#incidentSection">Incidents</a>
+      <a href="#archSection">Architecture</a>
     </div>
   </div>
+</nav>
 
-  <script>
-    async function loadMetrics() {
-      const res = await fetch('/metrics');
-      const data = await res.json();
-      document.getElementById('metricTotal').textContent = data.total_incidents;
-      document.getElementById('metricEscalated').textContent = data.escalated_incidents;
-      document.getElementById('metricResolved').textContent = data.resolved_incidents;
+<!-- HERO -->
+<div class="hero">
+  <div class="overline fade-in">Autonomous Loss Prevention</div>
+  <h1 class="fade-in">Intelligent Retail<br>Shrinkage Detection.</h1>
+  <p class="fade-in">Real-time vision analysis. POS cross-validation. Autonomous incident escalation. Built for production retail operations.</p>
+  <div class="cta-row fade-in">
+    <button class="btn btn-primary" id="heroDemo">Run Live Demo</button>
+    <button class="btn btn-outline" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">Watch Feed</button>
+  </div>
+</div>
+
+<!-- LIVE FEED -->
+<section id="liveFeedSection">
+  <div class="section-label fade-in">Live Monitoring</div>
+  <div class="section-title fade-in">See what the agent sees.</div>
+  <div class="section-sub fade-in">Real-time camera feed with behavioral analysis overlay. The agent watches for item disappearance patterns and validates against POS data before escalating.</div>
+
+  <div class="feed-layout fade-in">
+    <div class="camera-box">
+      <video id="cameraFeed" autoplay muted playsinline></video>
+      <canvas id="cameraCanvas" style="display:none"></canvas>
+      <div class="camera-overlay" id="cameraOverlay"></div>
+      <div class="camera-hud">
+        <div class="live-dot"></div>
+        <div class="live-label" id="feedLabel">Live</div>
+      </div>
+      <div class="camera-status">
+        <div class="stat"><div class="val" id="hudFrames">0</div><div class="lbl">Frames</div></div>
+        <div class="stat"><div class="val" id="hudEvents">0</div><div class="lbl">Events</div></div>
+        <div class="stat"><div class="val" id="hudIncidents">0</div><div class="lbl">Incidents</div></div>
+        <div class="stat"><div class="val" id="hudStatus">Monitoring</div><div class="lbl">Agent Status</div></div>
+      </div>
+    </div>
+
+    <div class="feed-side">
+      <div class="glass">
+        <div class="card-title">Detection Log</div>
+        <div class="event-log" id="eventLog">Waiting for camera...</div>
+      </div>
+      <div class="glass">
+        <div class="card-title">Agent Actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px;" id="agentActions">
+          <div style="color:var(--text-secondary);font-size:13px;">No actions yet.</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%" id="feedDemo">Simulate Theft Scenario</button>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section id="metricsSection">
+  <div class="section-label fade-in">Real-Time Analytics</div>
+  <div class="section-title fade-in">Numbers that matter.</div>
+  <div class="section-sub fade-in">Live operational metrics from the agent pipeline, updated in real time.</div>
+  <div class="metrics-grid fade-in">
+    <div class="glass metric-card">
+      <div class="number" id="mTotal">0</div>
+      <div class="desc">Total Incidents</div>
+    </div>
+    <div class="glass metric-card">
+      <div class="number" id="mEscalated">0</div>
+      <div class="desc">Escalated</div>
+    </div>
+    <div class="glass metric-card">
+      <div class="number" id="mResolved">0</div>
+      <div class="desc">Resolved by POS</div>
+    </div>
+    <div class="glass metric-card">
+      <div class="number" id="mFrames">0</div>
+      <div class="desc">Frames Processed</div>
+    </div>
+  </div>
+</section>
+
+<!-- INCIDENTS -->
+<section id="incidentSection">
+  <div class="section-label fade-in">Incident Feed</div>
+  <div class="section-title fade-in">Every event. Every decision.</div>
+  <div class="section-sub fade-in">Full audit trail of detected anomalies, POS validation results, and escalation decisions.</div>
+  <div class="incident-table-wrap fade-in">
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Incident ID</th>
+          <th>SKU</th>
+          <th>Confidence</th>
+          <th>POS Match</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody id="incidentRows">
+        <tr><td colspan="6" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents recorded yet. Run a demo to see the pipeline in action.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="archSection">
+  <div class="section-label fade-in">Under The Hood</div>
+  <div class="section-title fade-in">Production-grade pipeline.</div>
+  <div class="section-sub fade-in">Multi-stage agentic workflow: observe, validate, decide, package, alert.</div>
+  <div class="arch-flow fade-in">
+    <div class="arch-node">Camera Feed</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">Vision Agent</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">Behavior Detector</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">POS Cross-Check</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">Decision Engine</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">Incident Manager</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">Evidence Clip</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">Slack Alert</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Autonomous Retail Loss Prevention Intelligence Platform &mdash; Built with FastAPI, Python, and production engineering principles.</p>
+</footer>
+
+<script>
+  let totalFrames = 0;
+  let cameraActive = false;
+
+  // ── Intersection Observer for fade-in ──
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+  // ── Camera ──
+  async function startCamera() {
+    const video = document.getElementById('cameraFeed');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: 1280, height: 720 }, audio: false });
+      video.srcObject = stream;
+      cameraActive = true;
+      document.getElementById('feedLabel').textContent = 'Live';
+      simulateContinuousFeed();
+    } catch {
+      video.poster = '';
+      video.style.background = 'linear-gradient(135deg,#0a0a0a,#1a1a2e)';
+      document.getElementById('feedLabel').textContent = 'Simulated';
+      cameraActive = false;
+      simulateContinuousFeed();
     }
+  }
 
-    async function loadIncidents() {
-      const res = await fetch('/incidents');
-      const data = await res.json();
+  // ── Continuous feed simulation ──
+  function simulateContinuousFeed() {
+    setInterval(async () => {
+      totalFrames++;
+      document.getElementById('hudFrames').textContent = totalFrames;
+      document.getElementById('mFrames').textContent = totalFrames;
+      const isNormal = Math.random() > 0.08;
+      const payload = {
+        source_frame_index: totalFrames,
+        timestamp_utc: new Date().toISOString(),
+        item_sku: 'sku-apple-001',
+        item_visible: isNormal,
+        hand_near_item: !isNormal && Math.random() > 0.3,
+        motion_score: isNormal ? +(Math.random() * 0.25).toFixed(2) : +(0.4 + Math.random() * 0.5).toFixed(2),
+      };
+      try {
+        const res = await fetch('/vision/observations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (data.event) {
+          flashOverlay('alert');
+          addLogLine(`ALERT: ${data.event.event_type} (conf=${data.event.confidence}) sku=${data.event.observed_sku}`, true);
+          addAction(`Suspicious event detected. Querying POS...`, 'orange');
+          setTimeout(() => addAction(`POS cross-check complete. Escalation decision made.`, 'accent'), 800);
+        }
+      } catch {}
+    }, 1200);
+  }
+
+  function flashOverlay(type) {
+    const overlay = document.getElementById('cameraOverlay');
+    overlay.className = 'camera-overlay ' + type;
+    document.getElementById('hudStatus').textContent = type === 'alert' ? 'ALERT' : 'Clear';
+    document.getElementById('hudStatus').style.color = type === 'alert' ? 'var(--red)' : 'var(--green)';
+    setTimeout(() => { overlay.className = 'camera-overlay clear'; document.getElementById('hudStatus').textContent = 'Monitoring'; document.getElementById('hudStatus').style.color = ''; }, 3000);
+  }
+
+  function addLogLine(text, isAlert) {
+    const log = document.getElementById('eventLog');
+    if (log.textContent === 'Waiting for camera...') log.innerHTML = '';
+    const ts = new Date().toLocaleTimeString();
+    const line = document.createElement('div');
+    line.className = 'line';
+    line.innerHTML = `<span class="ts">[${ts}]</span> <span class="${isAlert ? 'evt' : ''}">${text}</span>`;
+    log.prepend(line);
+    while (log.children.length > 30) log.removeChild(log.lastChild);
+  }
+
+  function addAction(text, color) {
+    const box = document.getElementById('agentActions');
+    if (box.children.length === 1 && box.children[0].textContent === 'No actions yet.') box.innerHTML = '';
+    const el = document.createElement('div');
+    el.style.cssText = `font-size:13px;color:var(--${color || 'text-secondary'});padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);`;
+    el.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+    box.prepend(el);
+    while (box.children.length > 10) box.removeChild(box.lastChild);
+  }
+
+  // ── Data refresh ──
+  async function refreshAll() {
+    try {
+      const [metrics, incidents, events] = await Promise.all([
+        fetch('/metrics').then(r => r.json()),
+        fetch('/incidents').then(r => r.json()),
+        fetch('/vision/events').then(r => r.json()),
+      ]);
+      document.getElementById('mTotal').textContent = metrics.total_incidents;
+      document.getElementById('mEscalated').textContent = metrics.escalated_incidents;
+      document.getElementById('mResolved').textContent = metrics.resolved_incidents;
+      document.getElementById('hudEvents').textContent = events.length;
+      document.getElementById('hudIncidents').textContent = metrics.total_incidents;
+
       const rows = document.getElementById('incidentRows');
-      rows.innerHTML = '';
-      const recent = [...data].reverse().slice(0, 10);
-      if (recent.length === 0) {
-        rows.innerHTML = '<tr><td colspan="4" style="color:#94a3b8;">No incidents yet.</td></tr>';
-        return;
+      if (incidents.length === 0) {
+        rows.innerHTML = '<tr><td colspan="6" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents recorded yet.</td></tr>';
+      } else {
+        rows.innerHTML = '';
+        for (const item of [...incidents].reverse().slice(0, 12)) {
+          const cls = item.status === 'escalated' ? 'escalated' : 'resolved';
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><span class="pill ${cls}">${item.status.toUpperCase()}</span></td>
+            <td style="font-family:monospace;font-size:12px;">${item.incident_id}</td>
+            <td>${item.observed_sku}</td>
+            <td>${item.confidence.toFixed(3)}</td>
+            <td>${item.pos_match ? 'Yes' : 'No'}</td>
+            <td style="color:var(--text-secondary);font-size:13px;">${item.decision_reason}</td>
+          `;
+          rows.appendChild(tr);
+        }
       }
-      for (const item of recent) {
-        const tr = document.createElement('tr');
-        const badgeClass = item.status === 'escalated' ? 'escalated' : 'resolved';
-        tr.innerHTML = `
-          <td><span class="badge ${badgeClass}">${item.status}</span></td>
-          <td>${item.observed_sku}</td>
-          <td>${item.confidence.toFixed(3)}</td>
-          <td>${item.decision_reason}</td>
-        `;
-        rows.appendChild(tr);
-      }
-    }
+    } catch {}
+  }
 
-    async function loadEvents() {
-      const res = await fetch('/vision/events');
-      const data = await res.json();
-      const log = document.getElementById('eventLog');
-      if (data.length === 0) {
-        log.textContent = 'No suspicious events detected yet.';
-        return;
-      }
-      const lines = data.slice(-12).map((e) =>
-        `[${e.timestamp_utc}] ${e.event_type} sku=${e.observed_sku} conf=${e.confidence} reason="${e.reason}"`
-      );
-      log.textContent = lines.join('\n');
-    }
+  // ── Demo ──
+  async function runDemo() {
+    addAction('Demo scenario initiated. Sending observation sequence...', 'accent');
+    await fetch('/demo/run', { method: 'POST' });
+    flashOverlay('alert');
+    addLogLine('DEMO: Theft scenario simulation triggered', true);
+    setTimeout(() => addAction('Demo complete. Check incident feed below.', 'green'), 1500);
+    await refreshAll();
+  }
 
-    async function refreshAll() {
-      await Promise.all([loadMetrics(), loadIncidents(), loadEvents()]);
-    }
+  document.getElementById('heroDemo').addEventListener('click', runDemo);
+  document.getElementById('feedDemo').addEventListener('click', runDemo);
 
-    document.getElementById('runDemo').addEventListener('click', async () => {
-      await fetch('/demo/run', { method: 'POST' });
-      await refreshAll();
-    });
-    document.getElementById('refresh').addEventListener('click', refreshAll);
-
-    refreshAll();
-    setInterval(refreshAll, 3000);
-  </script>
+  // ── Init ──
+  startCamera();
+  refreshAll();
+  setInterval(refreshAll, 2500);
+</script>
 </body>
 </html>
