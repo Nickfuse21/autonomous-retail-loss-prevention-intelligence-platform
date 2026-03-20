@@ -2,6 +2,8 @@
 
 > Agentic computer vision system that detects suspicious retail behavior, validates against POS data, and autonomously escalates with evidence.
 
+![Project Banner](assets/hero-banner.svg)
+
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Production%20API-009688?logo=fastapi&logoColor=white)
 ![CI](https://img.shields.io/badge/CI-Ready-111827)
