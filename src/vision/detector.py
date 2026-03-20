@@ -57,9 +57,8 @@ class BaselineBehaviorDetector:
             return None
 
         if self._last_alert_frame_index is not None:
-            in_cooldown = (
-                frame.source_frame_index - self._last_alert_frame_index <= self.cooldown_frames
-            )
+            frame_delta = frame.source_frame_index - self._last_alert_frame_index
+            in_cooldown = 0 <= frame_delta <= self.cooldown_frames
             if in_cooldown:
                 return None
 

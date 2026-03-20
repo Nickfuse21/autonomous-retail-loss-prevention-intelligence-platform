@@ -19,3 +19,7 @@ class Incident(BaseModel):
     zone_exit_probability: float | None = None
     reasoning_narrative: str | None = None
     reasoning_chain: dict[str, object] | None = None
+    review_status: str = "unreviewed"
+    review_action: str | None = None
+    review_notes: str | None = None
+    reviewed_at_utc: str | None = None

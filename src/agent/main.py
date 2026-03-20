@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 from src.incidents.manager import IncidentManager
 from src.vision.detector import SuspiciousEvent
@@ -67,8 +68,60 @@ def list_recent_events() -> list[SuspiciousEventOut]:
 
 
 @app.get("/incidents")
-def list_incidents() -> list[dict[str, object]]:
-    return [item.model_dump() for item in incident_manager.list_incidents()]
+def list_incidents(
+    status: str | None = Query(default=None),
+    sku: str | None = Query(default=None),
+    min_confidence: float | None = Query(default=None, ge=0.0, le=1.0),
+    max_confidence: float | None = Query(default=None, ge=0.0, le=1.0),
+    review_status: str | None = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=1000),
+) -> list[dict[str, object]]:
+    return [
+        item.model_dump()
+        for item in incident_manager.list_incidents(
+            count=limit,
+            status=status,
+            sku=sku,
+            min_confidence=min_confidence,
+            max_confidence=max_confidence,
+            review_status=review_status,
+        )
+    ]
+
+
+class ReviewActionIn(BaseModel):
+    action: str
+    notes: str | None = None
+
+
+@app.post("/incidents/{incident_id}/review")
+def review_incident(incident_id: str, payload: ReviewActionIn) -> dict[str, object]:
+    updated = incident_manager.update_review(
+        incident_id=incident_id,
+        action=payload.action,
+        notes=payload.notes,
+    )
+    if updated is None:
+        return {"ok": False, "error": "incident_not_found"}
+    return {"ok": True, "incident": updated.model_dump()}
+
+
+@app.get("/incidents/export.csv")
+def export_incidents_csv(
+    status: str | None = Query(default=None),
+    sku: str | None = Query(default=None),
+    review_status: str | None = Query(default=None),
+) -> PlainTextResponse:
+    csv_text = incident_manager.export_incidents_csv(
+        status=status,
+        sku=sku,
+        review_status=review_status,
+    )
+    return PlainTextResponse(
+        content=csv_text,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=incidents_export.csv"},
+    )
 
 
 @app.get("/metrics")

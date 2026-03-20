@@ -29,6 +29,12 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
+    #scrollProgress {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+      background: linear-gradient(90deg, #2997ff, #30d158);
+      z-index: 200; transition: width .12s linear;
+      box-shadow: 0 0 10px rgba(41,151,255,0.7);
+    }
 
     /* ── NAV ── */
     nav {
@@ -48,6 +54,11 @@
     nav .links { display: flex; gap: 28px; }
     nav .links a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; transition: color .2s; }
     nav .links a:hover { color: var(--text); }
+    nav .links a.active { color: var(--text); position: relative; }
+    nav .links a.active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -10px; height: 2px;
+      background: var(--accent); border-radius: 2px;
+    }
 
     /* ── HERO ── */
     .hero {
@@ -74,7 +85,7 @@
     .hero .cta-row { margin-top: 36px; display: flex; gap: 14px; }
     .btn {
       padding: 14px 28px; border-radius: 980px; font-size: 15px; font-weight: 600;
-      cursor: pointer; border: none; transition: all .25s;
+      cursor: pointer; border: none; transition: all .25s; will-change: transform;
     }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover { background: #0077ed; transform: scale(1.04); }
@@ -155,9 +166,10 @@
       backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       background: var(--glass); border: 1px solid var(--glass-border);
       border-radius: var(--radius); padding: 24px;
-      transition: transform .3s, box-shadow .3s;
+      transition: transform .25s, box-shadow .3s, border-color .25s;
+      transform-style: preserve-3d;
     }
-    .glass:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .glass:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); border-color: rgba(41,151,255,0.25); }
     .glass .card-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 
     /* ── METRICS ROW ── */
@@ -283,6 +295,7 @@
   </style>
 </head>
 <body>
+<div id="scrollProgress"></div>
 
 <!-- NAV -->
 <nav>
@@ -379,6 +392,36 @@
   <div class="section-label fade-in">Incident Feed</div>
   <div class="section-title fade-in">Every event. Every decision.</div>
   <div class="section-sub fade-in">Full audit trail of detected anomalies, POS validation results, and escalation decisions.</div>
+  <div class="glass fade-in" style="margin-top:24px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto auto;gap:10px;align-items:end;">
+    <div>
+      <div class="card-title">Search SKU</div>
+      <input id="filterSku" placeholder="e.g. sku-electronics-042" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);">
+    </div>
+    <div>
+      <div class="card-title">Status</div>
+      <select id="filterStatus" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);">
+        <option value="">All</option>
+        <option value="escalated">Escalated</option>
+        <option value="resolved">Resolved</option>
+      </select>
+    </div>
+    <div>
+      <div class="card-title">Review</div>
+      <select id="filterReview" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);">
+        <option value="">All</option>
+        <option value="unreviewed">Unreviewed</option>
+        <option value="approved">Approved</option>
+        <option value="dismissed">Dismissed</option>
+        <option value="escalated_security">Escalated Security</option>
+      </select>
+    </div>
+    <div>
+      <div class="card-title">Min Confidence</div>
+      <input id="filterMinConf" type="number" min="0" max="1" step="0.05" placeholder="0.0" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);">
+    </div>
+    <button class="btn btn-outline" id="applyFilters">Apply</button>
+    <button class="btn btn-outline" id="exportCsv">Export CSV</button>
+  </div>
   <div class="incident-table-wrap fade-in">
     <table>
       <thead>
@@ -389,10 +432,12 @@
           <th>Confidence</th>
           <th>POS Match</th>
           <th>Reason</th>
+          <th>Review</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="incidentRows">
-        <tr><td colspan="6" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents recorded yet. Run a demo to see the pipeline in action.</td></tr>
+        <tr><td colspan="8" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents recorded yet. Run a demo to see the pipeline in action.</td></tr>
       </tbody>
     </table>
   </div>
@@ -484,6 +529,8 @@
 <script>
   let totalFrames = 0;
   let cameraActive = false;
+  const metricState = { mTotal: 0, mEscalated: 0, mResolved: 0, mFrames: 0 };
+  const incidentFilters = { status: "", sku: "", min_confidence: "", review_status: "" };
 
   // ── Intersection Observer for fade-in ──
   const obs = new IntersectionObserver((entries) => {
@@ -576,26 +623,37 @@
   // ── Data refresh ──
   async function refreshAll() {
     try {
+      const query = new URLSearchParams();
+      if (incidentFilters.status) query.set('status', incidentFilters.status);
+      if (incidentFilters.sku) query.set('sku', incidentFilters.sku);
+      if (incidentFilters.review_status) query.set('review_status', incidentFilters.review_status);
+      if (incidentFilters.min_confidence !== "") query.set('min_confidence', incidentFilters.min_confidence);
       const [metrics, incidents, events, behaviors, zones] = await Promise.all([
         fetch('/metrics').then(r => r.json()),
-        fetch('/incidents').then(r => r.json()),
+        fetch('/incidents?' + query.toString()).then(r => r.json()),
         fetch('/vision/events').then(r => r.json()),
         fetch('/behavior/history').then(r => r.json()),
         fetch('/zones').then(r => r.json()),
       ]);
-      document.getElementById('mTotal').textContent = metrics.total_incidents;
-      document.getElementById('mEscalated').textContent = metrics.escalated_incidents;
-      document.getElementById('mResolved').textContent = metrics.resolved_incidents;
+      animateMetric('mTotal', metrics.total_incidents);
+      animateMetric('mEscalated', metrics.escalated_incidents);
+      animateMetric('mResolved', metrics.resolved_incidents);
+      animateMetric('mFrames', metrics.frames_processed || totalFrames);
       document.getElementById('hudEvents').textContent = events.length;
       document.getElementById('hudIncidents').textContent = metrics.total_incidents;
 
       const rows = document.getElementById('incidentRows');
       if (incidents.length === 0) {
-        rows.innerHTML = '<tr><td colspan="6" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents recorded yet.</td></tr>';
+        rows.innerHTML = '<tr><td colspan="8" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents found with current filters.</td></tr>';
       } else {
         rows.innerHTML = '';
         for (const item of [...incidents].reverse().slice(0, 12)) {
           const cls = item.status === 'escalated' ? 'escalated' : 'resolved';
+          const reviewCls = item.review_status === 'unreviewed'
+            ? 'warning'
+            : item.review_status === 'dismissed'
+              ? 'normal'
+              : 'suspicious';
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td><span class="pill ${cls}">${item.status.toUpperCase()}</span></td>
@@ -604,9 +662,30 @@
             <td>${item.confidence.toFixed(3)}</td>
             <td>${item.pos_match ? 'Yes' : 'No'}</td>
             <td style="color:var(--text-secondary);font-size:13px;">${item.behavior_pattern || '-'}</td>
+            <td><span class="behavior-chip ${reviewCls}">${(item.review_status || 'unreviewed').replace('_',' ')}</span></td>
+            <td>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:approve">Approve</button>
+                <button class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:false_positive">Dismiss</button>
+                <button class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:escalate_security">Escalate</button>
+              </div>
+            </td>
           `;
           rows.appendChild(tr);
         }
+        rows.querySelectorAll('[data-review]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const [incidentId, action] = btn.getAttribute('data-review').split(':');
+            const notes = window.prompt('Optional review notes:') || null;
+            await fetch(`/incidents/${incidentId}/review`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action, notes }),
+            });
+            addAction(`Review action submitted: ${action} for ${incidentId}`, 'accent');
+            await refreshAll();
+          });
+        });
       }
 
       // Reasoning chain
@@ -668,6 +747,78 @@
     }
   }
 
+  function animateMetric(id, nextValue) {
+    const el = document.getElementById(id);
+    const start = Number(metricState[id] || 0);
+    const end = Number(nextValue || 0);
+    if (!el || start === end) return;
+    const duration = 450;
+    const started = performance.now();
+    function tick(now) {
+      const t = Math.min(1, (now - started) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const val = Math.round(start + (end - start) * eased);
+      el.textContent = String(val);
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    metricState[id] = end;
+    requestAnimationFrame(tick);
+  }
+
+  function initMicroInteractions() {
+    // Scroll progress
+    const progress = document.getElementById('scrollProgress');
+    window.addEventListener('scroll', () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = total > 0 ? (window.scrollY / total) * 100 : 0;
+      progress.style.width = ratio + '%';
+    }, { passive: true });
+
+    // Active nav link based on visible section
+    const navLinks = Array.from(document.querySelectorAll('nav .links a'));
+    const sectionMap = navLinks
+      .map(a => ({ a, sec: document.querySelector(a.getAttribute('href')) }))
+      .filter(x => x.sec);
+    const navObserver = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        navLinks.forEach(l => l.classList.remove('active'));
+        const found = sectionMap.find(x => x.sec === e.target);
+        if (found) found.a.classList.add('active');
+      }
+    }, { threshold: 0.35 });
+    sectionMap.forEach(({ sec }) => navObserver.observe(sec));
+
+    // Subtle tilt effect on cards
+    const tiltTargets = document.querySelectorAll('.glass, .arch-node');
+    tiltTargets.forEach((el) => {
+      el.addEventListener('mousemove', (ev) => {
+        const r = el.getBoundingClientRect();
+        const px = (ev.clientX - r.left) / r.width;
+        const py = (ev.clientY - r.top) / r.height;
+        const rx = (0.5 - py) * 4;
+        const ry = (px - 0.5) * 4;
+        el.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = '';
+      });
+    });
+
+    // Magnetic CTA buttons
+    document.querySelectorAll('.btn').forEach((btn) => {
+      btn.addEventListener('mousemove', (ev) => {
+        const r = btn.getBoundingClientRect();
+        const dx = ev.clientX - (r.left + r.width / 2);
+        const dy = ev.clientY - (r.top + r.height / 2);
+        btn.style.transform = `translate(${dx * 0.08}px, ${dy * 0.08}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = '';
+      });
+    });
+  }
+
   // ── Demo ──
   async function runDemo() {
     addAction('Demo scenario initiated. Sending observation sequence...', 'accent');
@@ -680,8 +831,23 @@
 
   document.getElementById('heroDemo').addEventListener('click', runDemo);
   document.getElementById('feedDemo').addEventListener('click', runDemo);
+  document.getElementById('applyFilters').addEventListener('click', async () => {
+    incidentFilters.sku = document.getElementById('filterSku').value.trim();
+    incidentFilters.status = document.getElementById('filterStatus').value;
+    incidentFilters.review_status = document.getElementById('filterReview').value;
+    incidentFilters.min_confidence = document.getElementById('filterMinConf').value;
+    await refreshAll();
+  });
+  document.getElementById('exportCsv').addEventListener('click', () => {
+    const q = new URLSearchParams();
+    if (incidentFilters.status) q.set('status', incidentFilters.status);
+    if (incidentFilters.sku) q.set('sku', incidentFilters.sku);
+    if (incidentFilters.review_status) q.set('review_status', incidentFilters.review_status);
+    window.open('/incidents/export.csv?' + q.toString(), '_blank');
+  });
 
   // ── Init ──
+  initMicroInteractions();
   startCamera();
   refreshAll();
   setInterval(refreshAll, 2500);

@@ -1,4 +1,6 @@
 from datetime import datetime, timezone
+import csv
+import io
 from uuid import uuid4
 
 from src.alerts.slack import SlackNotifier
@@ -80,8 +82,89 @@ class IncidentManager:
         self._incidents.append(incident)
         return incident
 
-    def list_incidents(self, count: int = 50) -> list[Incident]:
-        return self._incidents[-count:]
+    def list_incidents(
+        self,
+        count: int = 50,
+        status: str | None = None,
+        sku: str | None = None,
+        min_confidence: float | None = None,
+        max_confidence: float | None = None,
+        review_status: str | None = None,
+    ) -> list[Incident]:
+        items = self._incidents
+        if status:
+            items = [i for i in items if i.status == status]
+        if sku:
+            items = [i for i in items if sku.lower() in i.observed_sku.lower()]
+        if min_confidence is not None:
+            items = [i for i in items if i.confidence >= min_confidence]
+        if max_confidence is not None:
+            items = [i for i in items if i.confidence <= max_confidence]
+        if review_status:
+            items = [i for i in items if i.review_status == review_status]
+        return items[-count:]
+
+    def update_review(self, incident_id: str, action: str, notes: str | None = None) -> Incident | None:
+        incident = next((i for i in self._incidents if i.incident_id == incident_id), None)
+        if incident is None:
+            return None
+        incident.review_action = action
+        incident.review_notes = notes
+        incident.reviewed_at_utc = datetime.now(timezone.utc).isoformat()
+        if action == "approve":
+            incident.review_status = "approved"
+        elif action == "false_positive":
+            incident.review_status = "dismissed"
+            incident.status = "resolved"
+        elif action == "escalate_security":
+            incident.review_status = "escalated_security"
+            incident.status = "escalated"
+        else:
+            incident.review_status = "reviewed"
+        return incident
+
+    def export_incidents_csv(
+        self,
+        status: str | None = None,
+        sku: str | None = None,
+        review_status: str | None = None,
+    ) -> str:
+        rows = self.list_incidents(
+            count=10000,
+            status=status,
+            sku=sku,
+            review_status=review_status,
+        )
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(
+            [
+                "incident_id",
+                "status",
+                "review_status",
+                "observed_sku",
+                "confidence",
+                "pos_match",
+                "behavior_pattern",
+                "zone_heading",
+                "observed_at_utc",
+            ]
+        )
+        for row in rows:
+            writer.writerow(
+                [
+                    row.incident_id,
+                    row.status,
+                    row.review_status,
+                    row.observed_sku,
+                    row.confidence,
+                    row.pos_match,
+                    row.behavior_pattern or "",
+                    row.zone_heading or "",
+                    row.observed_at_utc,
+                ]
+            )
+        return output.getvalue()
 
     def metrics(self) -> dict[str, int]:
         total = len(self._incidents)
