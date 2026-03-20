@@ -1,6 +1,6 @@
 # Autonomous Retail Loss Prevention Intelligence Platform
 
-> Agentic computer vision system that detects suspicious retail behavior, validates against POS data, and autonomously escalates with evidence.
+> Agentic retail intelligence platform that combines behavioral sequence analysis, zone-aware trajectory modeling, POS validation, and explainable reasoning chains for incident decisions.
 
 <p align="center">
   <img src="assets/hero-banner.svg" alt="Autonomous Retail Shrinkage Agent Banner" width="100%" />
@@ -14,17 +14,17 @@
 
 ## Project description
 
-Autonomous Retail Shrinkage Agent is an end-to-end AI operations demo that detects suspicious shelf behavior, validates incidents against POS activity, and generates actionable escalation records through APIs and a real-time dashboard.
+An end-to-end AI loss-prevention system that goes beyond object disappearance rules. It models suspicious intent using multi-stage behavior patterns, spatial movement through store zones, and transaction validation before escalation.
 
-## Business and engineering value
+## What makes this unique
 
-This project models a practical retail operations workflow instead of a standalone ML demo:
-- Detects suspicious shelf behavior and converts it into structured events
-- Validates events against POS scans before escalation to reduce false alarms
-- Produces incident artifacts (timeline, evidence reference, alert payload) for auditability
-- Exposes service APIs and a live dashboard for operations visibility
+Most portfolio projects stop at "object missing => alert". This platform implements three core intelligence layers:
 
-The architecture emphasizes production concerns: deterministic workflows, test coverage, explicit service boundaries, and reproducible local deployment.
+- **Behavioral sequence engine:** tracks micro-behaviors (`lingering`, `pickup`, `look-around`, `conceal`, `move-to-exit`) and matches known theft signatures.
+- **Zone intelligence engine:** classifies person trajectories across store layout zones and estimates checkout-vs-exit intent.
+- **Explainable reasoning engine:** generates a step-by-step decision chain (`observation -> behavior -> zone -> POS -> confidence -> verdict`) for audit-ready transparency.
+
+This design produces richer, lower-noise incident decisions and gives operations teams explainable evidence instead of black-box alerts.
 
 ## System architecture
 
@@ -57,15 +57,24 @@ flowchart LR
 ## Visual dashboard
 
 Open `http://localhost:8080/` to access a polished operations dashboard with:
-- Live incident metrics (total, escalated, resolved)
-- Real-time incident feed table
-- Event stream log
-- One-click `Run Demo Scenario` button for instant end-to-end demo
+- Live camera/simulated feed with detection HUD
+- Incident metrics and real-time event stream
+- Explainable reasoning chain panel (latest verdict with steps)
+- Behavioral timeline (micro-behavior chips)
+- Zone map + trajectory verdict + checkout/exit probability bars
+- One-click advanced theft scenario simulation
+
+## Core intelligence modules
+
+- `src/vision/behaviors.py` - behavioral sequence analysis and theft signature matching
+- `src/vision/zones.py` - zone-aware trajectory classification
+- `src/vision/reasoning.py` - explainable reasoning chain generation
+- `src/incidents/manager.py` - confidence fusion and incident decision lifecycle
 
 ## Tech stack
 
 - **Core:** Python, FastAPI, Pydantic
-- **Vision/data plane (next build steps):** OpenCV, FFmpeg
+- **Vision/data plane:** OpenCV-ready architecture, frame-stream inference loop
 - **Transport:** HTTPX for POS and webhook calls
 - **Quality:** Pytest, Ruff, MyPy, GitHub Actions
 - **Deployment:** Docker Compose (agent + POS mock)
@@ -111,10 +120,12 @@ Health checks:
 
 Demo endpoints:
 - `GET /` dashboard UI
-- `POST /demo/run` generate sample behavior sequence
+- `POST /demo/run` run multi-stage theft scenario with zone progression
 - `GET /vision/events` suspicious event stream
 - `GET /incidents` processed incident objects
 - `GET /metrics` dashboard counters
+- `GET /behavior/history` recent micro-behavior signals
+- `GET /zones` store layout and zone metadata
 
 ## Docker run
 
@@ -132,16 +143,17 @@ docker compose up --build
 - Day 6: Slack incident cards + operational hardening
 - Day 7: polishing, tests, benchmark notes, and demo assets
 
-## Phase 2 progress
+## Validation status
 
-- Added observation ingestion endpoint: `POST /vision/observations`
-- Added event listing endpoint: `GET /vision/events`
-- Implemented in-memory frame buffer and baseline disappearance detector
-- Added tests for both event and no-event behavior patterns
+- 14 automated tests passing
+- Behavior engine tests (sequence matching + normal behavior rejection)
+- Zone engine tests (exit/checkout trajectory classification)
+- Reasoning engine tests (escalated/resolved chain generation)
+- End-to-end smoke tests for API + demo scenario
 
 ## Key implementation highlights
 
-- Multi-signal decisioning pipeline combining vision events and POS transaction checks
-- Incident lifecycle management with escalation and resolution states
-- Evidence packaging and alert dispatch simulation for downstream operations tooling
-- Operator-facing dashboard for real-time status, metrics, and incident review
+- Multi-stage intent inference instead of single-trigger alerting
+- Spatially aware trajectory analysis tied to business outcomes
+- Explainable, auditable decision narratives for each incident
+- Premium interactive UI for live monitoring, debugging, and demo storytelling
