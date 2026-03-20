@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  agent:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "pip install -e . && uvicorn src.agent.main:app --host 0.0.0.0 --port 8080"
+    ports:
+      - "8080:8080"
+
+  mock-pos:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "pip install -e . && uvicorn src.api.mock_pos_api:app --host 0.0.0.0 --port 8081"
+    ports:
+      - "8081:8081"

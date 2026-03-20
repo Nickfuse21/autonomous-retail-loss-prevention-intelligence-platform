@@ -1,0 +1,17 @@
+{
+  "incident_id": "inc_20260320_101533_cam01",
+  "store_id": "store_001",
+  "camera_id": "cam_01",
+  "event_type": "suspected_item_concealment",
+  "confidence": 0.92,
+  "observed_sku": "sku-apple-001",
+  "observed_at_utc": "2026-03-20T10:15:33.902Z",
+  "pos_match": false,
+  "pos_window_seconds": 60,
+  "decision_reason": "No matching POS scan found within correlation window",
+  "evidence": {
+    "clip_uri": "file:///data/clips/inc_20260320_101533_cam01.mp4",
+    "clip_seconds": 5
+  },
+  "status": "escalated"
+}
