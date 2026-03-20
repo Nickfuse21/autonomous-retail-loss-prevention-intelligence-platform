@@ -50,6 +50,14 @@ flowchart LR
 5. Generates an incident-centered 5-second clip.
 6. Sends a structured Slack alert with evidence and reason code.
 
+## Visual dashboard
+
+Open `http://localhost:8080/` to access a polished operations dashboard with:
+- Live incident metrics (total, escalated, resolved)
+- Real-time incident feed table
+- Event stream log
+- One-click `Run Demo Scenario` button for instant end-to-end demo
+
 ## Tech stack
 
 - **Core:** Python, FastAPI, Pydantic
@@ -97,6 +105,13 @@ Health checks:
 - Agent: `http://localhost:8080/health`
 - Mock POS: `http://localhost:8081/health`
 
+Demo endpoints:
+- `GET /` dashboard UI
+- `POST /demo/run` generate sample behavior sequence
+- `GET /vision/events` suspicious event stream
+- `GET /incidents` processed incident objects
+- `GET /metrics` dashboard counters
+
 ## Docker run
 
 ```powershell
@@ -112,6 +127,13 @@ docker compose up --build
 - Day 5: deterministic 5-second clip generation + evidence package
 - Day 6: Slack incident cards + operational hardening
 - Day 7: polishing, tests, benchmark notes, and demo assets
+
+## Phase 2 progress
+
+- Added observation ingestion endpoint: `POST /vision/observations`
+- Added event listing endpoint: `GET /vision/events`
+- Implemented in-memory frame buffer and baseline disappearance detector
+- Added tests for both event and no-event behavior patterns
 
 ## Recruiter-friendly impact bullets
 

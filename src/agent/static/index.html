@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shrinkage Agent Dashboard</title>
+  <style>
+    :root {
+      --bg: #070b16;
+      --panel: #10182d;
+      --panel-soft: #0f1f3d;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --primary: #22d3ee;
+      --accent: #34d399;
+      --danger: #f97316;
+      --border: #223153;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background: radial-gradient(circle at 20% 20%, #15274d, var(--bg) 40%);
+      color: var(--text);
+    }
+    .container { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    .hero {
+      background: linear-gradient(145deg, #121f3f, #0d1530 55%, #0a4f63);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    h1 { margin: 0; font-size: 30px; }
+    .sub { color: #cbd5e1; margin-top: 8px; max-width: 700px; line-height: 1.45; }
+    .row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+    .card {
+      background: linear-gradient(170deg, var(--panel), #0a1224);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .metric { font-size: 26px; font-weight: 700; margin-top: 4px; }
+    .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .actions { display: flex; gap: 10px; }
+    button {
+      border: none;
+      background: linear-gradient(120deg, var(--primary), #0ea5e9);
+      color: #062432;
+      font-weight: 700;
+      padding: 12px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: linear-gradient(120deg, #334155, #1e293b);
+      color: #e2e8f0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #1b2848; }
+    th { color: #93c5fd; font-weight: 600; }
+    .badge {
+      padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      display: inline-block;
+    }
+    .badge.escalated { background: #7c2d12; color: #fdba74; }
+    .badge.resolved { background: #064e3b; color: #86efac; }
+    .log {
+      max-height: 320px;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      background: #070d1e;
+      border-radius: 12px;
+      border: 1px solid #1b2848;
+      padding: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div>
+        <h1>Autonomous Retail Shrinkage Agent</h1>
+        <div class="sub">
+          Vision anomaly detection + POS cross-validation + autonomous incident packaging.
+          This dashboard shows live events, escalations, and evidence generation.
+        </div>
+      </div>
+      <div class="actions">
+        <button id="runDemo">Run Demo Scenario</button>
+        <button class="secondary" id="refresh">Refresh</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="card">
+        <div class="label">Total Incidents</div>
+        <div class="metric" id="metricTotal">0</div>
+      </div>
+      <div class="card">
+        <div class="label">Escalated</div>
+        <div class="metric" id="metricEscalated">0</div>
+      </div>
+      <div class="card">
+        <div class="label">Resolved by POS Match</div>
+        <div class="metric" id="metricResolved">0</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label" style="margin-bottom: 10px;">Incident Feed</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>SKU</th>
+              <th>Confidence</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody id="incidentRows"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="label" style="margin-bottom: 10px;">Event Stream</div>
+        <div class="log" id="eventLog">Waiting for data...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadMetrics() {
+      const res = await fetch('/metrics');
+      const data = await res.json();
+      document.getElementById('metricTotal').textContent = data.total_incidents;
+      document.getElementById('metricEscalated').textContent = data.escalated_incidents;
+      document.getElementById('metricResolved').textContent = data.resolved_incidents;
+    }
+
+    async function loadIncidents() {
+      const res = await fetch('/incidents');
+      const data = await res.json();
+      const rows = document.getElementById('incidentRows');
+      rows.innerHTML = '';
+      const recent = [...data].reverse().slice(0, 10);
+      if (recent.length === 0) {
+        rows.innerHTML = '<tr><td colspan="4" style="color:#94a3b8;">No incidents yet.</td></tr>';
+        return;
+      }
+      for (const item of recent) {
+        const tr = document.createElement('tr');
+        const badgeClass = item.status === 'escalated' ? 'escalated' : 'resolved';
+        tr.innerHTML = `
+          <td><span class="badge ${badgeClass}">${item.status}</span></td>
+          <td>${item.observed_sku}</td>
+          <td>${item.confidence.toFixed(3)}</td>
+          <td>${item.decision_reason}</td>
+        `;
+        rows.appendChild(tr);
+      }
+    }
+
+    async function loadEvents() {
+      const res = await fetch('/vision/events');
+      const data = await res.json();
+      const log = document.getElementById('eventLog');
+      if (data.length === 0) {
+        log.textContent = 'No suspicious events detected yet.';
+        return;
+      }
+      const lines = data.slice(-12).map((e) =>
+        `[${e.timestamp_utc}] ${e.event_type} sku=${e.observed_sku} conf=${e.confidence} reason="${e.reason}"`
+      );
+      log.textContent = lines.join('\n');
+    }
+
+    async function refreshAll() {
+      await Promise.all([loadMetrics(), loadIncidents(), loadEvents()]);
+    }
+
+    document.getElementById('runDemo').addEventListener('click', async () => {
+      await fetch('/demo/run', { method: 'POST' });
+      await refreshAll();
+    });
+    document.getElementById('refresh').addEventListener('click', refreshAll);
+
+    refreshAll();
+    setInterval(refreshAll, 3000);
+  </script>
+</body>
+</html>
