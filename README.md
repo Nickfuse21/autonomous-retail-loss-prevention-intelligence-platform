@@ -1,4 +1,4 @@
-# Autonomous Retail Shrinkage Agent
+# Autonomous Retail Loss Prevention Intelligence Platform
 
 > Agentic computer vision system that detects suspicious retail behavior, validates against POS data, and autonomously escalates with evidence.
 
@@ -73,7 +73,7 @@ Open `http://localhost:8080/` to access a polished operations dashboard with:
 ## Project layout
 
 ```text
-autonomous-retail-shrinkage-agent/
+autonomous-retail-loss-prevention-intelligence-platform/
   docs/
     architecture.md
   src/
