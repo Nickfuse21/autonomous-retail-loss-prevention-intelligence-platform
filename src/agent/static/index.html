@@ -116,9 +116,9 @@
       border-bottom: 1px solid rgba(255,255,255,0.08);
     }
     nav .inner {
-      max-width: 1120px; margin: 0 auto;
+      max-width: 1200px; margin: 0 auto;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 24px;
+      padding: 12px 40px;
     }
     nav .logo { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
     nav .logo span { color: var(--accent); }
@@ -132,36 +132,39 @@
     }
     .status-bar {
       position: fixed;
-      top: 58px;
+      top: 52px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 95;
-      width: min(1240px, calc(100vw - 36px));
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      background: rgba(2, 6, 23, 0.62);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap: 10px;
-      padding: 10px 14px;
+      width: min(1280px, calc(100vw - 24px));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      background: rgba(2, 6, 23, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0;
+      padding: 0;
+      overflow: hidden;
     }
+    .status-bar::-webkit-scrollbar { display: none; }
     .status-cell {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
       color: var(--text-secondary);
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.03);
+      font-size: 11px;
+      padding: 8px 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255,255,255,0.06);
     }
+    .status-cell:last-child { border-right: none; flex: 1; }
     .status-cell .v {
       color: #fff;
       font-weight: 600;
-      font-size: 12px;
+      font-size: 11px;
     }
     .status-dot {
       width: 8px;
@@ -202,29 +205,65 @@
       transition: background .2s, border-color .2s;
     }
     .quick-btn:hover { background: rgba(41,151,255,0.16); border-color: rgba(41,151,255,0.45); }
+    /* ── CONTROL RAIL (collapsible) ── */
+    .rail-toggle {
+      position: fixed;
+      right: 16px;
+      top: 60px;
+      z-index: 99;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(2,6,23,0.82);
+      backdrop-filter: blur(12px);
+      color: var(--text-secondary);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s, color .2s;
+    }
+    .rail-toggle:hover { background: rgba(41,151,255,0.18); color: #fff; }
     .control-rail {
       position: fixed;
       right: 16px;
-      top: 144px;
-      width: 220px;
+      top: 100px;
+      width: 224px;
       z-index: 98;
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 14px;
-      background: rgba(2, 6, 23, 0.72);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      transition: transform .25s ease, opacity .25s ease;
+      gap: 7px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      transform: translateX(calc(100% + 24px));
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
     }
+    .control-rail.rail-open {
+      transform: translateX(0);
+      pointer-events: all;
+    }
+    .control-rail::-webkit-scrollbar { width: 4px; }
+    .control-rail::-webkit-scrollbar-track { background: transparent; }
+    .control-rail::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
     .rail-hd {
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1.2px;
       color: var(--text-secondary);
       font-weight: 700;
+      padding: 0 2px 4px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .rail-row {
       display: flex;
@@ -233,10 +272,12 @@
       gap: 8px;
       font-size: 12px;
       color: var(--text-secondary);
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      border-radius: 9px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
       padding: 8px 10px;
+      flex-shrink: 0;
+      min-height: 36px;
     }
     .switch {
       position: relative;
@@ -284,7 +325,7 @@
     .hero {
       min-height: 100vh; display: flex; flex-direction: column;
       align-items: center; justify-content: center; text-align: center;
-      padding: 168px 24px 80px;
+      padding: 148px 24px 80px;
       background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(41,151,255,0.15), transparent),
                   radial-gradient(ellipse 60% 40% at 80% 100%, rgba(48,209,88,0.08), transparent);
       position: relative;
@@ -333,7 +374,17 @@
     .btn-outline:hover { background: rgba(41,151,255,0.1); }
 
     /* ── SECTIONS ── */
-    section { padding: 100px 24px; max-width: 1120px; margin: 0 auto; }
+    section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+    /* ── GRID UTILITIES ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 16px; }
+    .grid-14 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+    @media (max-width: 960px) {
+      .grid-2, .grid-3, .grid-14 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 80px 16px; }
+    }
     .section-label {
       font-size: 14px; font-weight: 600; color: var(--accent);
       letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
@@ -466,15 +517,59 @@
     }
     .metric-card .desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
 
+    /* ── INCIDENT FILTER BAR ── */
+    .incident-filter-bar {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .incident-filter-bar .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      min-width: 130px;
+    }
+    .incident-filter-bar .filter-field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .incident-filter-bar input,
+    .incident-filter-bar select {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .incident-filter-bar input:focus,
+    .incident-filter-bar select:focus { border-color: rgba(41,151,255,0.5); }
+    .incident-filter-bar .filter-actions {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+
     /* ── INCIDENT TABLE ── */
     #incidentSection {
       border-top: 1px solid rgba(255,255,255,0.06);
     }
     .incident-table-wrap {
-      margin-top: 40px; border-radius: var(--radius); overflow: hidden;
+      margin-top: 20px; border-radius: var(--radius); overflow-x: auto;
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(20px); background: var(--glass);
     }
+    .incident-table-wrap table { min-width: 820px; }
     .incident-row {
       cursor: pointer;
     }
@@ -483,15 +578,19 @@
     }
     table { width: 100%; border-collapse: collapse; }
     thead th {
-      text-align: left; padding: 16px 20px;
+      text-align: left; padding: 14px 16px;
       font-size: 11px; font-weight: 600; color: var(--text-secondary);
       text-transform: uppercase; letter-spacing: 1px;
       background: rgba(255,255,255,0.03);
       border-bottom: 1px solid rgba(255,255,255,0.06);
+      white-space: nowrap;
     }
     tbody td {
-      padding: 14px 20px; font-size: 14px;
+      padding: 12px 16px; font-size: 13px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     tbody tr { transition: background .2s; }
     tbody tr:hover { background: rgba(255,255,255,0.03); }
@@ -576,20 +675,20 @@
     }
     .incident-panel {
       position: fixed;
-      top: 120px;
-      right: 18px;
-      width: min(420px, calc(100vw - 36px));
-      max-height: calc(100vh - 140px);
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(400px, 90vw);
       overflow-y: auto;
-      padding: 18px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(2, 6, 23, 0.78);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      z-index: 110;
-      transform: translateX(110%);
-      transition: transform .35s ease;
+      padding: 24px 20px 24px;
+      border-left: 1px solid rgba(255,255,255,0.1);
+      background: rgba(2, 6, 23, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 120;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      box-shadow: -16px 0 48px rgba(0,0,0,0.5);
     }
     .incident-panel.open {
       transform: translateX(0);
@@ -644,9 +743,7 @@
     @media (max-width: 768px) {
       .feed-layout { grid-template-columns: 1fr; }
       .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-      .status-bar { grid-template-columns: 1fr 1fr; top: 56px; }
-      .incident-panel { top: 98px; right: 10px; left: 10px; width: auto; }
-      .control-rail { display: none; }
+      .rail-toggle { display: none; }
     }
     @keyframes heroAura {
       0%, 100% { opacity: 0.45; transform: translateX(-50%) scale(0.95); }
@@ -697,6 +794,7 @@
     <div class="links">
       <a href="#liveFeedSection">Live Feed</a>
       <a href="#metricsSection">Metrics</a>
+      <a href="#operationsSection">Operations</a>
       <a href="#incidentSection">Incidents</a>
       <a href="#reasoningSection">Reasoning</a>
       <a href="#zoneSection">Zone Map</a>
@@ -728,11 +826,12 @@
     </span>
   </div>
 </div>
+<button class="rail-toggle" id="railToggle" title="Controls">⚙</button>
 <aside class="control-rail" id="controlRail">
   <div class="rail-hd">Interactive Controls</div>
-  <div class="rail-row" style="display:block;">
-    <span style="display:block;margin-bottom:6px;">Workspace Mode</span>
-    <select id="workspaceMode" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);font-size:12px;">
+  <div class="rail-row" style="flex-direction:column;align-items:stretch;gap:6px;">
+    <span style="font-size:11px;color:var(--text-secondary);">Workspace Mode</span>
+    <select id="workspaceMode" style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;outline:none;">
       <option value="analyst">Analyst</option>
       <option value="manager">Manager</option>
     </select>
@@ -875,22 +974,36 @@
   </div>
 </section>
 
-<section id="operationsSection">
+<section id="operationsSection" style="border-top: 1px solid rgba(255,255,255,0.06); background: radial-gradient(ellipse 60% 50% at 60% 0%, rgba(167,139,250,0.06), transparent);">
   <div class="section-label fade-in">Enterprise Workflow</div>
   <div class="section-title fade-in">Open investigations and audit trail.</div>
   <div class="section-sub fade-in">Operations-first workspace with queue, evidence package, and timeline for defensible review decisions.</div>
-  <div style="margin-top:24px;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px;" class="fade-in">
-    <div class="glass" style="padding:18px;">
-      <div class="card-title">Open Investigations</div>
-      <div id="openInvestigationsQueue" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text-secondary);"></div>
+  <div class="grid-3 fade-in" style="margin-top:32px;">
+    <div class="glass">
+      <div class="card-title">Open Investigations <span id="openInvCount" style="color:var(--orange);font-size:11px;">(0)</span></div>
+      <div id="openInvestigationsQueue" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text-secondary);max-height:340px;overflow-y:auto;"></div>
     </div>
-    <div class="glass" style="padding:18px;">
-      <div class="card-title">Evidence and Reasoning</div>
+    <div class="glass">
+      <div class="card-title">Evidence Package</div>
       <div id="evidencePanel" style="margin-top:10px;font-size:13px;line-height:1.7;color:var(--text-secondary);">Select an incident to inspect evidence package.</div>
+      <div style="margin-top:12px;">
+        <button class="btn btn-outline" id="downloadEvidence" style="padding:8px 14px;font-size:11px;display:none;">Download Evidence JSON</button>
+      </div>
     </div>
-    <div class="glass" style="padding:18px;">
+    <div class="glass">
       <div class="card-title">Audit Timeline</div>
-      <div id="auditTimelinePanel" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-secondary);">No timeline events yet.</div>
+      <div id="auditTimelinePanel" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-secondary);max-height:340px;overflow-y:auto;">No timeline events yet.</div>
+    </div>
+  </div>
+
+  <div class="grid-2 fade-in" style="margin-top:20px;">
+    <div class="glass">
+      <div class="card-title">System Health</div>
+      <div id="systemHealthPanel" style="margin-top:10px;display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--text-secondary);">Checking dependencies...</div>
+    </div>
+    <div class="glass">
+      <div class="card-title">Incident Analytics</div>
+      <div id="incidentAnalytics" style="margin-top:10px;display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--text-secondary);">Waiting for data...</div>
     </div>
   </div>
 </section>
@@ -900,22 +1013,22 @@
   <div class="section-label fade-in">Incident Feed</div>
   <div class="section-title fade-in">Every event. Every decision.</div>
   <div class="section-sub fade-in">Full audit trail of detected anomalies, POS validation results, and escalation decisions.</div>
-  <div class="glass fade-in" style="margin-top:24px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto auto;gap:10px;align-items:end;">
-    <div>
-      <div class="card-title">Search SKU</div>
-      <input id="filterSku" placeholder="e.g. sku-electronics-042" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);">
+  <div class="glass fade-in incident-filter-bar">
+    <div class="filter-field" style="flex:2;min-width:200px;">
+      <label>Search SKU</label>
+      <input id="filterSku" placeholder="e.g. sku-electronics-042">
     </div>
-    <div>
-      <div class="card-title">Status</div>
-      <select id="filterStatus" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);">
+    <div class="filter-field">
+      <label>Status</label>
+      <select id="filterStatus">
         <option value="">All</option>
         <option value="escalated">Escalated</option>
         <option value="resolved">Resolved</option>
       </select>
     </div>
-    <div>
-      <div class="card-title">Review</div>
-      <select id="filterReview" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);">
+    <div class="filter-field">
+      <label>Review</label>
+      <select id="filterReview">
         <option value="">All</option>
         <option value="unreviewed">Unreviewed</option>
         <option value="approved">Approved</option>
@@ -923,12 +1036,14 @@
         <option value="escalated_security">Escalated Security</option>
       </select>
     </div>
-    <div>
-      <div class="card-title">Min Confidence</div>
-      <input id="filterMinConf" type="number" min="0" max="1" step="0.05" placeholder="0.0" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--text);">
+    <div class="filter-field" style="min-width:120px;max-width:150px;">
+      <label>Min Confidence</label>
+      <input id="filterMinConf" type="number" min="0" max="1" step="0.05" placeholder="0.0">
     </div>
-    <button class="btn btn-outline" id="applyFilters">Apply</button>
-    <button class="btn btn-outline" id="exportCsv">Export CSV</button>
+    <div class="filter-actions">
+      <button class="btn btn-outline" id="applyFilters">Apply</button>
+      <button class="btn btn-outline" id="exportCsv">Export CSV</button>
+    </div>
   </div>
   <div class="incident-table-wrap fade-in">
     <table>
@@ -956,12 +1071,12 @@
   <div class="section-label fade-in">Explainable AI</div>
   <div class="section-title fade-in">Every decision. Fully explained.</div>
   <div class="section-sub fade-in">The reasoning engine produces a step-by-step chain showing exactly why an incident was escalated or resolved. No black boxes.</div>
-  <div style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="fade-in">
-    <div class="glass" style="padding:28px;">
+  <div class="grid-2 fade-in" style="margin-top:40px;">
+    <div class="glass">
       <div class="card-title">Latest Reasoning Chain</div>
       <div id="reasoningChain" style="font-size:13px;line-height:1.8;color:var(--text-secondary);">Run a demo to see the reasoning chain.</div>
     </div>
-    <div class="glass" style="padding:28px;">
+    <div class="glass">
       <div class="card-title">Behavioral Sequence Timeline</div>
       <div id="behaviorTimeline" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
       <div style="margin-top:16px;font-size:12px;color:#555;">Micro-behaviors detected across the observation window.</div>
@@ -974,8 +1089,8 @@
   <div class="section-label fade-in">Spatial Intelligence</div>
   <div class="section-title fade-in">Zone-aware trajectory analysis.</div>
   <div class="section-sub fade-in">The agent tracks person movement across store zones and classifies whether the trajectory heads toward checkout or exit.</div>
-  <div style="margin-top:40px;display:grid;grid-template-columns:1.4fr 1fr;gap:20px;" class="fade-in">
-    <div class="glass" style="padding:24px;position:relative;">
+  <div class="grid-14 fade-in" style="margin-top:40px;">
+    <div class="glass" style="position:relative;">
       <div class="card-title">Store Zone Map</div>
       <div id="zoneMap" style="position:relative;width:100%;aspect-ratio:2/1.2;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:#0a0a0e;margin-top:12px;overflow:hidden;"></div>
     </div>
@@ -1028,6 +1143,21 @@
     <div class="arch-node">Slack Alert</div>
   </div>
 </section>
+
+<!-- KEYBOARD HINTS -->
+<div style="max-width:1200px;margin:0 auto;padding:0 40px 20px;">
+  <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:16px 0;border-top:1px solid rgba(255,255,255,0.06);">
+    <span style="font-size:11px;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-right:8px;">Keyboard Shortcuts</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">D</kbd><span style="font-size:11px;color:#555;">Demo</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">R</kbd><span style="font-size:11px;color:#555;">Refresh</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">M</kbd><span style="font-size:11px;color:#555;">Sound</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">/</kbd><span style="font-size:11px;color:#555;">Search SKU</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">1</kbd><span style="font-size:11px;color:#555;">Speed</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">2</kbd><span style="font-size:11px;color:#555;">Balanced</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">3</kbd><span style="font-size:11px;color:#555;">Accuracy</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">Esc</kbd><span style="font-size:11px;color:#555;">Close Panel</span>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
@@ -1634,40 +1764,133 @@
     playUiTone('panelOpen');
   }
 
+  let opsSelectedIncidentId = null;
+
   function renderOperationsWorkspace(incidents) {
     const queue = document.getElementById('openInvestigationsQueue');
     const evidence = document.getElementById('evidencePanel');
     const timeline = document.getElementById('auditTimelinePanel');
+    const countBadge = document.getElementById('openInvCount');
+    const dlBtn = document.getElementById('downloadEvidence');
     if (!queue || !evidence || !timeline) return;
-    const open = [...incidents].filter(i => i.review_status === 'unreviewed').reverse().slice(0, 8);
+    const open = [...incidents].filter(i => i.review_status === 'unreviewed').reverse().slice(0, 12);
+    if (countBadge) countBadge.textContent = `(${open.length})`;
     if (!open.length) {
-      queue.innerHTML = '<div>No open investigations.</div>';
+      queue.innerHTML = '<div style="padding:12px 0;">All incidents reviewed.</div>';
     } else {
-      queue.innerHTML = open.map(i => `<button data-open-inc="${i.incident_id}" class="btn btn-outline" style="text-align:left;padding:8px 10px;">${i.incident_id}<br><span style="font-size:11px;color:var(--text-secondary);">${i.observed_sku} · ${(i.confidence*100).toFixed(0)}%</span></button>`).join('');
+      queue.innerHTML = open.map(i => {
+        const active = opsSelectedIncidentId === i.incident_id ? 'background:rgba(41,151,255,0.18);border-color:rgba(41,151,255,0.5);' : '';
+        return `<button data-open-inc="${i.incident_id}" class="btn btn-outline" style="text-align:left;padding:10px 12px;${active}">
+          <div style="font-size:12px;font-weight:700;color:#fff;">${i.incident_id}</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">${i.observed_sku} · ${(i.confidence*100).toFixed(0)}% · ${i.status}</div>
+        </button>`;
+      }).join('');
     }
     queue.querySelectorAll('[data-open-inc]').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-open-inc');
+        opsSelectedIncidentId = id;
         const selected = incidents.find(i => i.incident_id === id);
-        if (selected) openIncidentPanel(selected);
+        if (selected) {
+          renderEvidencePanel(selected);
+          openIncidentPanel(selected);
+        }
       });
     });
-    const latest = [...incidents].reverse()[0];
-    if (!latest) {
+    const target = opsSelectedIncidentId
+      ? incidents.find(i => i.incident_id === opsSelectedIncidentId)
+      : [...incidents].reverse()[0];
+    if (!target) {
       evidence.textContent = 'No incidents yet.';
       timeline.textContent = 'No timeline events yet.';
+      if (dlBtn) dlBtn.style.display = 'none';
       return;
     }
+    renderEvidencePanel(target);
+    renderIncidentAnalytics(incidents);
+  }
+
+  function renderEvidencePanel(item) {
+    const evidence = document.getElementById('evidencePanel');
+    const timeline = document.getElementById('auditTimelinePanel');
+    const dlBtn = document.getElementById('downloadEvidence');
+    if (!evidence) return;
+    const ep = item.evidence_package || {};
     evidence.innerHTML = `
-      <div><strong>ID:</strong> ${latest.incident_id}</div>
-      <div><strong>Clip:</strong> ${latest.clip_path || '-'}</div>
-      <div><strong>POS:</strong> ${latest.pos_match ? 'Matched transaction' : 'Mismatch'}</div>
-      <div><strong>Reasoning:</strong> ${latest.reasoning_narrative || '-'}</div>
+      <div style="display:grid;grid-template-columns:100px 1fr;gap:6px 12px;">
+        <span style="color:var(--text-secondary);">ID</span><span style="color:#fff;font-weight:600;word-break:break-all;">${item.incident_id}</span>
+        <span style="color:var(--text-secondary);">Clip</span><span>${ep.clip_path || item.clip_path || '-'}</span>
+        <span style="color:var(--text-secondary);">POS Match</span><span style="color:${item.pos_match ? 'var(--green)' : 'var(--red)'};">${item.pos_match ? 'Matched' : 'Mismatch'}</span>
+        <span style="color:var(--text-secondary);">Detector</span><span>${ep.detector_snapshot?.event_type || '-'} (${((ep.detector_snapshot?.detector_confidence || 0)*100).toFixed(0)}%)</span>
+        <span style="color:var(--text-secondary);">Reasoning</span><span style="line-height:1.5;">${item.reasoning_narrative || '-'}</span>
+        <span style="color:var(--text-secondary);">Reviewer</span><span>${ep.reviewer_notes || 'No notes yet'}</span>
+      </div>
     `;
-    const events = Array.isArray(latest.audit_timeline) ? latest.audit_timeline : [];
-    timeline.innerHTML = events.length
-      ? events.map(e => `<div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-weight:600;color:#fff;">${e.event_type}</div><div>${(e.actor||'system')} · ${(e.timestamp_utc||'').replace('T',' ').slice(0,19)}</div></div>`).join('')
-      : 'No timeline events yet.';
+    if (dlBtn) {
+      dlBtn.style.display = 'inline-block';
+      dlBtn.onclick = () => {
+        const blob = new Blob([JSON.stringify({ incident: item, exported_at: new Date().toISOString(), schema_version: '1.0' }, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `evidence_${item.incident_id}.json`;
+        a.click();
+      };
+    }
+    if (timeline) {
+      const events = Array.isArray(item.audit_timeline) ? item.audit_timeline : [];
+      const iconMap = { incident_created: '&#9679;', alert_dispatched: '&#9889;', review_updated: '&#10003;' };
+      timeline.innerHTML = events.length
+        ? events.map(e => `<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,0.03);border-left:3px solid ${e.event_type === 'review_updated' ? 'var(--green)' : 'var(--accent)'};"><div style="font-weight:600;color:#fff;">${iconMap[e.event_type] || '&#8226;'} ${(e.event_type||'').replace(/_/g,' ')}</div><div style="margin-top:2px;">${(e.actor||'system')} · ${(e.timestamp_utc||'').replace('T',' ').slice(0,19)}</div></div>`).join('')
+        : '<div>No timeline events yet.</div>';
+    }
+  }
+
+  function renderIncidentAnalytics(incidents) {
+    const el = document.getElementById('incidentAnalytics');
+    if (!el || !incidents.length) return;
+    const total = incidents.length;
+    const escalated = incidents.filter(i => i.status === 'escalated').length;
+    const reviewed = incidents.filter(i => i.review_status !== 'unreviewed').length;
+    const avgConf = incidents.reduce((s, i) => s + (i.confidence || 0), 0) / total;
+    const escalationPct = ((escalated / total) * 100).toFixed(1);
+    const reviewPct = ((reviewed / total) * 100).toFixed(1);
+
+    function bar(label, pct, color) {
+      return `<div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>${label}</span><span style="color:#fff;font-weight:600;">${pct}%</span></div>
+        <div style="height:8px;border-radius:4px;background:rgba(255,255,255,0.08);overflow:hidden;">
+          <div style="height:100%;width:${Math.min(100, pct)}%;background:${color};border-radius:4px;transition:width .5s;"></div>
+        </div>
+      </div>`;
+    }
+    el.innerHTML =
+      bar('Escalation Rate', escalationPct, 'var(--red)') +
+      bar('Review Coverage', reviewPct, 'var(--green)') +
+      bar('Avg Confidence', (avgConf * 100).toFixed(1), 'var(--accent)') +
+      `<div style="font-size:11px;color:#555;margin-top:4px;">Based on ${total} incident${total !== 1 ? 's' : ''} in current session.</div>`;
+  }
+
+  async function refreshSystemHealth() {
+    const el = document.getElementById('systemHealthPanel');
+    if (!el) return;
+    try {
+      const data = await apiFetch('/health/dependencies').then(r => r.json());
+      const deps = data.dependencies || {};
+      function depRow(name, info) {
+        const ok = typeof info === 'string' ? info === 'ok' : (info?.device !== 'unknown');
+        const dot = ok
+          ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(48,209,88,0.6);"></span>'
+          : '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 6px rgba(255,159,10,0.6);"></span>';
+        const detail = typeof info === 'object' ? (info.device || info.mode || JSON.stringify(info).slice(0,60)) : info;
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);">${dot}<span style="color:#fff;font-weight:600;flex:1;">${name}</span><span style="font-size:11px;">${detail}</span></div>`;
+      }
+      el.innerHTML =
+        depRow('Incident DB', deps.incident_repository || 'unknown') +
+        depRow('Copilot', deps.copilot || {}) +
+        depRow('Detector', deps.detector || {});
+    } catch {
+      el.innerHTML = '<div style="color:var(--orange);">Could not reach /health/dependencies.</div>';
+    }
   }
 
   function initKeyboardShortcuts() {
@@ -1767,6 +1990,18 @@
   }
 
   function initRightRailControls() {
+    const railToggleBtn = document.getElementById('railToggle');
+    const controlRail = document.getElementById('controlRail');
+    if (railToggleBtn && controlRail) {
+      const railOpen = localStorage.getItem('railOpen') === '1';
+      if (railOpen) controlRail.classList.add('rail-open');
+      railToggleBtn.addEventListener('click', () => {
+        const isOpen = controlRail.classList.toggle('rail-open');
+        localStorage.setItem('railOpen', isOpen ? '1' : '0');
+        railToggleBtn.style.color = isOpen ? 'var(--accent)' : '';
+      });
+      if (railOpen) railToggleBtn.style.color = 'var(--accent)';
+    }
     applyUiState();
     const modeEl = document.getElementById('workspaceMode');
     if (modeEl) {
@@ -1978,7 +2213,9 @@
   initKeyboardShortcuts();
   startCamera();
   refreshAll();
+  refreshSystemHealth();
   setInterval(refreshAll, 2500);
+  setInterval(refreshSystemHealth, 15000);
 </script>
 </body>
 </html>
