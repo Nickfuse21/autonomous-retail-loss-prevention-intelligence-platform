@@ -13,6 +13,8 @@ class ObservationIn(BaseModel):
     person_y: float = Field(default=0.3, ge=0.0, le=1.0)
     head_rotation_score: float = Field(default=0.0, ge=0.0, le=1.0)
     linger_seconds: float = Field(default=0.0, ge=0.0)
+    store_id: str = Field(default="store-001", max_length=128)
+    camera_id: str = Field(default="cam-01", max_length=128)
 
 
 class SuspiciousEventOut(BaseModel):

@@ -34,13 +34,21 @@ def _env_int(name: str, default: int) -> int:
 
 def _parse_origins(raw: str) -> list[str]:
     parts = [x.strip() for x in raw.split(",") if x.strip()]
-    return parts if parts else ["http://localhost:8080", "http://127.0.0.1:8080"]
+    return parts if parts else [
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+    ]
 
 
 APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
 API_TOKEN = os.getenv("API_TOKEN", "").strip()
 CORS_ALLOWED_ORIGINS = _parse_origins(
-    os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:8080,http://127.0.0.1:8080")
+    os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:8080,http://127.0.0.1:8080,http://localhost:8081,http://127.0.0.1:8081",
+    )
 )
 MAX_IMAGE_BASE64_CHARS = _env_int("MAX_IMAGE_BASE64_CHARS", 4_000_000)
 RATE_LIMIT_WINDOW_SECONDS = max(10, _env_int("RATE_LIMIT_WINDOW_SECONDS", 60))
@@ -108,8 +116,23 @@ def dashboard() -> FileResponse:
 
 
 @app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok", "service": "agent", "ui": "enabled", "app_env": APP_ENV}
+def health() -> dict[str, object]:
+    return {
+        "status": "ok",
+        "service": "retail-loss-prevention-agent",
+        "product": "theft-detection",
+        "ui": "enabled",
+        "app_env": APP_ENV,
+        "version": app.version,
+        "capabilities": [
+            "vision_observations",
+            "incident_lifecycle",
+            "pos_correlation",
+            "copilot",
+            "evidence_export",
+            "theft_hot_spots",
+        ],
+    }
 
 
 def _require_api_token(x_api_token: str | None) -> None:
@@ -164,6 +187,8 @@ def ingest_observation(observation: ObservationIn) -> ObservationResponse:
             event,
             behavior_result=pipeline.last_behavior_result,
             zone_verdict=pipeline.last_zone_verdict,
+            store_id=observation.store_id.strip() or "store-001",
+            camera_id=observation.camera_id.strip() or "cam-01",
         )
     return ObservationResponse(processed=True, event=_serialize_event(event))
 
@@ -362,6 +387,12 @@ def metrics() -> dict[str, int]:
     base = incident_manager.metrics()
     base["frames_processed"] = frame_counter["total"]
     return base
+
+
+@app.get("/theft/hot-spots")
+def theft_hot_spots(top_n: int = Query(default=8, ge=1, le=50)) -> dict[str, object]:
+    """Camera / store pairs ranked by escalations plus unreviewed queue (ops heat map)."""
+    return {"items": incident_manager.theft_hot_spots(top_n=top_n)}
 
 
 @app.get("/metrics/extended")

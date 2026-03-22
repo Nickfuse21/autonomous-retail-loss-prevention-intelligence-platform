@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 import csv
 import io
@@ -37,6 +38,8 @@ class IncidentManager:
         event: SuspiciousEvent,
         behavior_result: BehaviorSequenceResult | None = None,
         zone_verdict: TrajectoryVerdict | None = None,
+        store_id: str | None = None,
+        camera_id: str | None = None,
     ) -> Incident:
         incident_id = f"inc_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:6]}"
         pos_match = self._pos_client.check_scan_match(
@@ -87,6 +90,8 @@ class IncidentManager:
             zone_exit_probability=round(zone_exit_prob, 3) if zone_exit_prob is not None else None,
             reasoning_narrative=chain.narrative,
             reasoning_chain=chain.to_dict(),
+            store_id=(store_id or "store-001").strip() or "store-001",
+            camera_id=(camera_id or "cam-01").strip() or "cam-01",
             evidence_package=EvidencePackage(
                 clip_path=clip_path,
                 detector_snapshot={
@@ -251,11 +256,53 @@ class IncidentManager:
         total = len(items)
         escalated = len([item for item in items if item.status == IncidentStatus.escalated])
         resolved = len([item for item in items if item.status == IncidentStatus.resolved])
+        unreviewed = sum(1 for item in items if item.review_status == ReviewStatus.unreviewed)
+        pos_mismatch = sum(1 for item in items if not item.pos_match)
+        # Queue priority: still needs human decision with strong model confidence
+        high_risk_unreviewed = sum(
+            1 for item in items if item.review_status == ReviewStatus.unreviewed and item.confidence >= 0.72
+        )
         return {
             "total_incidents": total,
             "escalated_incidents": escalated,
             "resolved_incidents": resolved,
+            "unreviewed_incidents": unreviewed,
+            "pos_mismatch_incidents": pos_mismatch,
+            "high_risk_unreviewed": high_risk_unreviewed,
         }
+
+    def theft_hot_spots(self, top_n: int = 8) -> list[dict[str, object]]:
+        """Rank store/camera pairs by theft-ops load (escalations + open review queue)."""
+        items = self._repository.list_incidents()
+        buckets: dict[tuple[str, str], dict[str, int]] = defaultdict(
+            lambda: {"incident_count": 0, "escalated_count": 0, "unreviewed_count": 0}
+        )
+        for item in items:
+            key = (item.store_id, item.camera_id)
+            buckets[key]["incident_count"] += 1
+            if item.status == IncidentStatus.escalated:
+                buckets[key]["escalated_count"] += 1
+            if item.review_status == ReviewStatus.unreviewed:
+                buckets[key]["unreviewed_count"] += 1
+        ranked = sorted(
+            buckets.items(),
+            key=lambda kv: (
+                kv[1]["escalated_count"] + kv[1]["unreviewed_count"],
+                kv[1]["incident_count"],
+            ),
+            reverse=True,
+        )
+        out: list[dict[str, object]] = []
+        for (store_id, camera_id), counts in ranked[: max(1, top_n)]:
+            out.append(
+                {
+                    "store_id": store_id,
+                    "camera_id": camera_id,
+                    **counts,
+                    "priority_score": counts["escalated_count"] + counts["unreviewed_count"],
+                }
+            )
+        return out
 
     def export_incident_evidence_bundle(self, incident_id: str) -> str | None:
         incident = next(

@@ -8,28 +8,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #000000;
-      --surface: rgba(255,255,255,0.04);
-      --glass: rgba(255,255,255,0.06);
-      --glass-border: rgba(255,255,255,0.10);
-      --text: #f5f5f7;
-      --text-secondary: #a1a1a6;
-      --accent: #2997ff;
-      --green: #30d158;
+      --bg: #0a0c10;
+      --panel: #0f1218;
+      --panel-elevated: #141820;
+      --surface: rgba(255,255,255,0.035);
+      --glass: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.12);
+      --border-strong: rgba(255,255,255,0.14);
+      --text: #e8eaed;
+      --text-secondary: #8b919a;
+      --accent: #3b9eff;
+      --green: #34c759;
       --orange: #ff9f0a;
       --red: #ff453a;
-      --radius: 20px;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --dock-width: 288px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       position: relative;
     }
+    body.theme-enterprise .interactive-bg { opacity: 0.45; }
+    body.theme-enterprise .blob { opacity: 0.14; }
     h1, h2, h3, .section-title, nav .logo {
       font-family: 'Sora', 'Inter', sans-serif;
     }
@@ -107,47 +114,66 @@
       box-shadow: 0 0 10px rgba(41,151,255,0.7);
     }
 
-    /* ── NAV ── */
+    /* ── TOP COMMAND BAR ── */
     nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      background: rgba(0,0,0,0.72);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: fixed; top: 0; left: 0; right: var(--dock-width); z-index: 100;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border-strong);
     }
     nav .inner {
-      max-width: 1200px; margin: 0 auto;
+      max-width: none; margin: 0;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 40px;
+      gap: 16px;
+      padding: 10px 20px 10px 24px;
+      flex-wrap: wrap;
     }
-    nav .logo { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+    nav .brand-block { display: flex; flex-direction: column; gap: 2px; }
+    nav .logo { font-weight: 700; font-size: 15px; letter-spacing: -0.2px; font-family: 'Sora', 'Inter', sans-serif; }
     nav .logo span { color: var(--accent); }
-    nav .links { display: flex; gap: 28px; }
-    nav .links a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; transition: color .2s; }
-    nav .links a:hover { color: var(--text); }
-    nav .links a.active { color: var(--text); position: relative; }
-    nav .links a.active::after {
-      content: ""; position: absolute; left: 0; right: 0; bottom: -10px; height: 2px;
-      background: var(--accent); border-radius: 2px;
+    nav .tagline { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.4px; font-weight: 600; }
+    .workspace-tabs {
+      display: flex; gap: 4px; flex: 1; justify-content: center; flex-wrap: wrap;
     }
+    .workspace-tabs button {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, color .2s, border-color .2s;
+      font-family: inherit;
+    }
+    .workspace-tabs button:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .workspace-tabs button.active {
+      color: var(--text);
+      background: rgba(59,158,255,0.12);
+      border-color: rgba(59,158,255,0.35);
+    }
+    body.dock-collapsed nav { right: 0; }
     .status-bar {
       position: fixed;
       top: 52px;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 12px;
+      right: calc(var(--dock-width) + 12px);
+      transform: none;
       z-index: 95;
-      width: min(1280px, calc(100vw - 24px));
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
-      background: rgba(2, 6, 23, 0.78);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      width: auto;
+      max-width: none;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: var(--panel-elevated);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
       display: flex;
       flex-wrap: nowrap;
       gap: 0;
       padding: 0;
-      overflow: hidden;
+      overflow-x: auto;
     }
+    body.dock-collapsed .status-bar { right: 12px; }
     .status-bar::-webkit-scrollbar { display: none; }
     .status-cell {
       display: flex;
@@ -205,56 +231,137 @@
       transition: background .2s, border-color .2s;
     }
     .quick-btn:hover { background: rgba(41,151,255,0.16); border-color: rgba(41,151,255,0.45); }
-    /* ── CONTROL RAIL (collapsible) ── */
-    .rail-toggle {
-      position: fixed;
-      right: 16px;
-      top: 60px;
-      z-index: 99;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(2,6,23,0.82);
-      backdrop-filter: blur(12px);
+    .mono-clip {
+      font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 10px;
       color: var(--text-secondary);
-      font-size: 15px;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: bottom;
+    }
+    .live-workbench {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .live-workbench .wb-field label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 4px;
+    }
+    .live-workbench .wb-field input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 12px;
+    }
+    .pipeline-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .btn-pause {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      transition: background .2s, border-color .2s;
+    }
+    .btn-pause:hover { border-color: rgba(41,151,255,0.4); }
+    .btn-pause.paused { background: rgba(255,159,10,0.15); border-color: rgba(255,159,10,0.35); color: var(--orange); }
+    .det-conf-row { margin-top: 10px; }
+    .det-conf-row label { font-size: 11px; color: var(--text-secondary); display: block; margin-bottom: 4px; }
+    .det-conf-row input[type="range"] { width: 100%; accent-color: var(--accent); }
+    /* ── RIGHT DOCK (command center) ── */
+    .dock-collapse {
+      position: fixed;
+      right: calc(var(--dock-width) - 1px);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 101;
+      width: 22px;
+      height: 48px;
+      border: 1px solid var(--border-strong);
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+      background: var(--panel);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 11px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background .2s, color .2s;
+      transition: right .25s ease, background .2s;
     }
-    .rail-toggle:hover { background: rgba(41,151,255,0.18); color: #fff; }
-    .control-rail {
+    .dock-collapse:hover { color: var(--accent); background: var(--panel-elevated); }
+    body.dock-collapsed .dock-collapse { right: 0; border-radius: 8px 0 0 8px; }
+    .shell-dock {
       position: fixed;
-      right: 16px;
-      top: 100px;
-      width: 224px;
-      z-index: 98;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 14px;
-      background: rgba(2, 6, 23, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 12px;
+      top: 0;
+      right: 0;
+      width: var(--dock-width);
+      height: 100vh;
+      z-index: 99;
+      background: var(--panel);
+      border-left: 1px solid var(--border-strong);
+      padding: 16px 14px 24px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform .25s ease;
+    }
+    body.dock-collapsed .shell-dock {
+      transform: translateX(100%);
+    }
+    .shell-dock::-webkit-scrollbar { width: 4px; }
+    .shell-dock::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+    .dock-section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--text-secondary);
+      font-weight: 700;
+      margin-bottom: 6px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .shell-dock .dock-section-title:first-of-type { border-top: none; padding-top: 0; }
+    #dockSelection {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      padding: 10px;
+      border-radius: 8px;
+      background: var(--panel-elevated);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-family: ui-monospace, monospace;
+    }
+    .control-rail {
       display: flex;
       flex-direction: column;
       gap: 7px;
-      max-height: calc(100vh - 120px);
-      overflow-y: auto;
-      overflow-x: hidden;
-      transform: translateX(calc(100% + 24px));
-      transition: transform .3s cubic-bezier(.4,0,.2,1);
-      pointer-events: none;
     }
-    .control-rail.rail-open {
-      transform: translateX(0);
-      pointer-events: all;
-    }
-    .control-rail::-webkit-scrollbar { width: 4px; }
-    .control-rail::-webkit-scrollbar-track { background: transparent; }
-    .control-rail::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
     .rail-hd {
       font-size: 11px;
       text-transform: uppercase;
@@ -374,7 +481,16 @@
     .btn-outline:hover { background: rgba(41,151,255,0.1); }
 
     /* ── SECTIONS ── */
-    section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+    section { padding: 64px 28px 72px; max-width: 1400px; margin: 0 auto; }
+    .shell-main { margin-right: var(--dock-width); padding-top: 108px; transition: margin-right .25s ease; min-height: 100vh; }
+    body.dock-collapsed .shell-main { margin-right: 0; }
+    .workspace-panel { display: none; }
+    .workspace-panel.active { display: block; }
+    body.theme-enterprise .hero {
+      min-height: 38vh;
+      padding: 100px 28px 56px;
+      background: var(--bg);
+    }
     /* ── GRID UTILITIES ── */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .grid-3 { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 16px; }
@@ -407,10 +523,63 @@
       display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px;
       align-items: start;
     }
+    .nvr-toolbar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 14;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.2) 100%);
+      pointer-events: auto;
+    }
+    .nvr-toolbar button {
+      padding: 6px 11px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(15,18,24,0.85);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .nvr-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+    .nvr-rec {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      color: var(--red);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nvr-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px var(--red); animation: pulse 1.2s infinite; }
+    .camera-box.nvr-grid::after {
+      content: "";
+      position: absolute; inset: 0; z-index: 5;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+      background-size: 10% 10%;
+      pointer-events: none;
+    }
+    .camera-box.nvr-fullscreen {
+      position: fixed !important;
+      inset: 12px;
+      z-index: 500;
+      aspect-ratio: auto !important;
+      max-width: none !important;
+      width: auto !important;
+      height: auto !important;
+      border-radius: var(--radius-lg) !important;
+    }
     .camera-box {
-      position: relative; border-radius: var(--radius); overflow: hidden;
-      border: 1px solid var(--glass-border);
-      background: #0a0a0a; aspect-ratio: 16/10;
+      position: relative; border-radius: var(--radius-lg); overflow: hidden;
+      border: 1px solid var(--border-strong);
+      background: #050608; aspect-ratio: 16/10;
     }
     #cameraFeed {
       width: 100%; height: 100%; object-fit: cover;
@@ -469,15 +638,16 @@
 
     /* ── GLASS CARD ── */
     .glass {
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       background: var(--glass); border: 1px solid var(--glass-border);
-      border-radius: var(--radius); padding: 24px;
-      transition: transform .25s, box-shadow .3s, border-color .25s;
+      border-radius: var(--radius-lg); padding: 20px;
+      transition: transform .2s, box-shadow .25s, border-color .2s;
       transform-style: preserve-3d;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
     }
-    .glass:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); border-color: rgba(41,151,255,0.25); }
+    .glass:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(0,0,0,0.45); border-color: rgba(59,158,255,0.22); }
     .glass::after {
       content: "";
       position: absolute;
@@ -504,7 +674,9 @@
     }
     .metrics-grid {
       margin-top: 48px;
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+      gap: 16px;
     }
     .metric-card { text-align: center; }
     .metric-card .number {
@@ -569,12 +741,61 @@
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(20px); background: var(--glass);
     }
-    .incident-table-wrap table { min-width: 820px; }
+    .incident-table-wrap table { min-width: 960px; }
     .incident-row {
       cursor: pointer;
     }
     .incident-row.active {
-      background: rgba(41,151,255,0.14);
+      background: rgba(59,158,255,0.12);
+    }
+    .incident-row.row-flash { animation: rowFlash 2s ease; }
+    @keyframes rowFlash {
+      0%, 100% { background: transparent; }
+      20% { background: rgba(59,158,255,0.18); }
+    }
+    .toast-stack {
+      position: fixed;
+      bottom: 20px; left: 20px;
+      z-index: 400;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+      max-width: 340px;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      border: 1px solid var(--border-strong);
+      background: var(--panel-elevated);
+      box-shadow: 0 14px 48px rgba(0,0,0,0.5);
+      animation: toastIn .3s ease;
+    }
+    .toast.ok { border-left: 3px solid var(--green); }
+    .toast.warn { border-left: 3px solid var(--orange); }
+    .toast.err { border-left: 3px solid var(--red); }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .metric-card.metrics-skeleton .number {
+      min-height: 52px;
+      width: 80%;
+      margin: 0 auto;
+      border-radius: 8px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: skel 1.1s ease infinite;
+      -webkit-background-clip: border-box;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+    @keyframes skel {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
     table { width: 100%; border-collapse: collapse; }
     thead th {
@@ -685,7 +906,7 @@
       background: rgba(2, 6, 23, 0.96);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      z-index: 120;
+      z-index: 220;
       transform: translateX(100%);
       transition: transform .3s cubic-bezier(.4,0,.2,1);
       box-shadow: -16px 0 48px rgba(0,0,0,0.5);
@@ -740,10 +961,28 @@
     .copilot-pill.high, .copilot-pill.critical { color: var(--red); border-color: rgba(255,69,58,0.35); }
     .copilot-pill.medium { color: var(--orange); border-color: rgba(255,159,10,0.35); }
     .copilot-pill.low { color: var(--green); border-color: rgba(48,209,88,0.35); }
+    @media (max-width: 1100px) {
+      :root { --dock-width: 260px; }
+    }
+    @media (max-width: 900px) {
+      body.dock-collapsed .shell-main { margin-right: 0; }
+      .shell-main { margin-right: 0; padding-top: 100px; }
+      .shell-dock {
+        transform: translateX(100%);
+        width: min(300px, 92vw);
+        z-index: 160;
+        box-shadow: -12px 0 40px rgba(0,0,0,0.5);
+      }
+      body.mobile-dock-open .shell-dock { transform: translateX(0); }
+      nav { right: 0; }
+      .status-bar { right: 12px; }
+      .dock-collapse { display: none; }
+      #mobileDockBtn { display: inline-block !important; }
+    }
     @media (max-width: 768px) {
       .feed-layout { grid-template-columns: 1fr; }
       .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-      .rail-toggle { display: none; }
+      .workspace-tabs { justify-content: flex-start; }
     }
     @keyframes heroAura {
       0%, 100% { opacity: 0.45; transform: translateX(-50%) scale(0.95); }
@@ -777,7 +1016,8 @@
     }
   </style>
 </head>
-<body>
+<body class="theme-enterprise">
+<div id="toastStack" class="toast-stack" aria-live="polite"></div>
 <div class="interactive-bg" aria-hidden="true">
   <div class="blob blob-a"></div>
   <div class="blob blob-b"></div>
@@ -787,19 +1027,19 @@
 </div>
 <div id="scrollProgress"></div>
 
-<!-- NAV -->
+<!-- TOP COMMAND BAR -->
 <nav>
   <div class="inner">
-    <div class="logo">Retail<span>Guard</span> AI</div>
-    <div class="links">
-      <a href="#liveFeedSection">Live Feed</a>
-      <a href="#metricsSection">Metrics</a>
-      <a href="#operationsSection">Operations</a>
-      <a href="#incidentSection">Incidents</a>
-      <a href="#reasoningSection">Reasoning</a>
-      <a href="#zoneSection">Zone Map</a>
-      <a href="#archSection">Architecture</a>
+    <div class="brand-block">
+      <div class="logo">Retail<span>Guard</span> AI</div>
+      <div class="tagline">Loss prevention · Command center</div>
     </div>
+    <div class="workspace-tabs" role="tablist" aria-label="Workspace">
+      <button type="button" class="active" role="tab" data-workspace="live" aria-selected="true">Live &amp; metrics</button>
+      <button type="button" role="tab" data-workspace="cases" aria-selected="false">Cases &amp; operations</button>
+      <button type="button" role="tab" data-workspace="intel" aria-selected="false">Intel &amp; architecture</button>
+    </div>
+    <button type="button" class="quick-btn" id="mobileDockBtn" style="display:none;">Dock</button>
   </div>
 </nav>
 
@@ -810,6 +1050,8 @@
   <div class="status-cell"><span>Frames/min</span><span class="v" id="sbFpm">0</span></div>
   <div class="status-cell"><span>Detector</span><span class="v" id="sbDetectorModel">Pretrained</span></div>
   <div class="status-cell"><span>Copilot</span><span class="v" id="sbCopilotMode">Live</span></div>
+  <div class="status-cell"><span>API</span><span class="v" id="sbApiHealth">OK</span></div>
+  <div class="status-cell"><span>Sync</span><span class="v"><span id="sbLastSync">--</span><br><span class="mono-clip" id="sbCorrId" title="Last request correlation ID">--</span></span></div>
   <div class="status-cell">
     <span>Sound</span>
     <span class="v" style="display:flex;align-items:center;gap:6px;">
@@ -826,34 +1068,41 @@
     </span>
   </div>
 </div>
-<button class="rail-toggle" id="railToggle" title="Controls">⚙</button>
-<aside class="control-rail" id="controlRail">
-  <div class="rail-hd">Interactive Controls</div>
-  <div class="rail-row" style="flex-direction:column;align-items:stretch;gap:6px;">
-    <span style="font-size:11px;color:var(--text-secondary);">Workspace Mode</span>
-    <select id="workspaceMode" style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;outline:none;">
-      <option value="analyst">Analyst</option>
-      <option value="manager">Manager</option>
-    </select>
+<button type="button" class="dock-collapse" id="dockCollapseBtn" title="Toggle right dock" aria-expanded="true">⟩</button>
+<aside class="shell-dock" id="shellDock" aria-label="Operator dock">
+  <div class="dock-section-title">Workspace</div>
+  <div class="control-rail" id="controlRail">
+    <div class="rail-row" style="flex-direction:column;align-items:stretch;gap:6px;">
+      <span style="font-size:11px;color:var(--text-secondary);">Role</span>
+      <select id="workspaceMode" style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;outline:none;">
+        <option value="analyst">Analyst</option>
+        <option value="manager">Manager</option>
+      </select>
+    </div>
+    <div class="rail-row">
+      <span>Ambient Motion</span>
+      <label class="switch"><input type="checkbox" id="toggleMotion" checked><span class="slider"></span></label>
+    </div>
+    <div class="rail-row">
+      <span>Card Tilt</span>
+      <label class="switch"><input type="checkbox" id="toggleTilt" checked><span class="slider"></span></label>
+    </div>
+    <div class="rail-row">
+      <span>Dense Overlay</span>
+      <label class="switch"><input type="checkbox" id="toggleDense"><span class="slider"></span></label>
+    </div>
+    <div class="rail-row">
+      <span>Copilot Auto</span>
+      <label class="switch"><input type="checkbox" id="toggleCopilotAuto" checked><span class="slider"></span></label>
+    </div>
   </div>
-  <div class="rail-row">
-    <span>Ambient Motion</span>
-    <label class="switch"><input type="checkbox" id="toggleMotion" checked><span class="slider"></span></label>
-  </div>
-  <div class="rail-row">
-    <span>Card Tilt</span>
-    <label class="switch"><input type="checkbox" id="toggleTilt" checked><span class="slider"></span></label>
-  </div>
-  <div class="rail-row">
-    <span>Dense Overlay</span>
-    <label class="switch"><input type="checkbox" id="toggleDense"><span class="slider"></span></label>
-  </div>
-  <div class="rail-row">
-    <span>Copilot Auto</span>
-    <label class="switch"><input type="checkbox" id="toggleCopilotAuto" checked><span class="slider"></span></label>
-  </div>
+  <div class="dock-section-title">Selection</div>
+  <div id="dockSelection">No row selected. Open <strong>Cases</strong> and click an incident.</div>
 </aside>
 
+<div class="shell-main" id="shellMain">
+
+<div class="workspace-panel active" id="ws-live">
 <!-- HERO -->
 <div class="hero">
   <div class="overline fade-in">Autonomous Loss Prevention</div>
@@ -861,7 +1110,7 @@
   <p class="fade-in">Real-time vision analysis. POS cross-validation. Autonomous incident escalation. Built for production retail operations.</p>
   <div class="cta-row fade-in">
     <button class="btn btn-primary" id="heroDemo">Run Live Demo</button>
-    <button class="btn btn-outline" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">Watch Feed</button>
+    <button class="btn btn-outline" type="button" id="heroWatchFeed">Watch Feed</button>
   </div>
 </div>
 
@@ -872,7 +1121,13 @@
   <div class="section-sub fade-in">Real-time camera feed with behavioral analysis overlay. The agent watches for item disappearance patterns and validates against POS data before escalating.</div>
 
   <div class="feed-layout fade-in">
-    <div class="camera-box">
+    <div class="camera-box" id="cameraBox">
+      <div class="nvr-toolbar">
+        <button type="button" id="nvrFs" title="Fullscreen video">⛶ Full</button>
+        <button type="button" id="nvrGrid" title="Alignment grid">Grid</button>
+        <button type="button" id="nvrSnap" title="Log snapshot marker">Mark</button>
+        <span class="nvr-rec"><span class="nvr-dot"></span> LIVE</span>
+      </div>
       <video id="cameraFeed" autoplay muted playsinline></video>
       <canvas id="cameraCanvas" style="display:none"></canvas>
       <div class="camera-overlay" id="cameraOverlay"></div>
@@ -890,6 +1145,24 @@
     </div>
 
     <div class="feed-side">
+      <div class="glass">
+        <div class="card-title">Site context & pipeline</div>
+        <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-bottom:8px;">Tag live observations with store and camera for filtering incidents. Pause stops vision observations and YOLO requests (useful for demos or CPU relief).</p>
+        <div class="live-workbench">
+          <div class="wb-field">
+            <label for="liveStoreId">Store ID</label>
+            <input id="liveStoreId" type="text" placeholder="store-001" autocomplete="off" />
+          </div>
+          <div class="wb-field">
+            <label for="liveCameraId">Camera ID</label>
+            <input id="liveCameraId" type="text" placeholder="cam-01" autocomplete="off" />
+          </div>
+        </div>
+        <div class="pipeline-bar">
+          <button type="button" class="btn-pause" id="pipelinePauseBtn" title="Pause or resume observation pipeline">Pause pipeline</button>
+          <span style="font-size:11px;color:var(--text-secondary);" id="pipelineStateLabel">Observations: running</span>
+        </div>
+      </div>
       <div class="glass">
         <div class="card-title">Detection Log</div>
         <div class="event-log" id="eventLog">Waiting for camera...</div>
@@ -916,6 +1189,10 @@
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:13px;color:var(--text-secondary);">
           <span>Last Frame Objects</span><strong id="detectorCount">0</strong>
+        </div>
+        <div class="det-conf-row">
+          <label for="detectorConfSlider"><span id="detectorConfLabel">Confidence threshold (profile)</span></label>
+          <input type="range" id="detectorConfSlider" min="15" max="70" value="35" title="Lower = more boxes, higher = stricter" />
         </div>
         <div style="font-size:12px;color:#888;margin-top:10px;" id="detectorMsg">Waiting for camera frames...</div>
       </div>
@@ -954,26 +1231,41 @@
   <div class="section-label fade-in">Real-Time Analytics</div>
   <div class="section-title fade-in">Numbers that matter.</div>
   <div class="section-sub fade-in">Live operational metrics from the agent pipeline, updated in real time.</div>
-  <div class="metrics-grid fade-in">
-    <div class="glass metric-card">
+  <div class="metrics-grid fade-in" id="metricsGrid">
+    <div class="glass metric-card metrics-skeleton">
       <div class="number" id="mTotal">0</div>
       <div class="desc">Total Incidents</div>
     </div>
-    <div class="glass metric-card">
+    <div class="glass metric-card metrics-skeleton">
       <div class="number" id="mEscalated">0</div>
       <div class="desc">Escalated</div>
     </div>
-    <div class="glass metric-card">
+    <div class="glass metric-card metrics-skeleton">
       <div class="number" id="mResolved">0</div>
       <div class="desc">Resolved by POS</div>
     </div>
-    <div class="glass metric-card">
+    <div class="glass metric-card metrics-skeleton">
       <div class="number" id="mFrames">0</div>
       <div class="desc">Frames Processed</div>
+    </div>
+    <div class="glass metric-card metrics-skeleton">
+      <div class="number" id="mUnreviewed">0</div>
+      <div class="desc">Review Queue</div>
+    </div>
+    <div class="glass metric-card metrics-skeleton">
+      <div class="number" id="mMismatch">0</div>
+      <div class="desc">POS Mismatch</div>
+    </div>
+    <div class="glass metric-card metrics-skeleton">
+      <div class="number" id="mHighRisk">0</div>
+      <div class="desc">High-Risk Open</div>
     </div>
   </div>
 </section>
 
+</div>
+
+<div class="workspace-panel" id="ws-cases">
 <section id="operationsSection" style="border-top: 1px solid rgba(255,255,255,0.06); background: radial-gradient(ellipse 60% 50% at 60% 0%, rgba(167,139,250,0.06), transparent);">
   <div class="section-label fade-in">Enterprise Workflow</div>
   <div class="section-title fade-in">Open investigations and audit trail.</div>
@@ -1036,6 +1328,14 @@
         <option value="escalated_security">Escalated Security</option>
       </select>
     </div>
+    <div class="filter-field">
+      <label>Store ID</label>
+      <input id="filterStoreId" placeholder="e.g. store-001">
+    </div>
+    <div class="filter-field">
+      <label>Camera ID</label>
+      <input id="filterCameraId" placeholder="e.g. cam-01">
+    </div>
     <div class="filter-field" style="min-width:120px;max-width:150px;">
       <label>Min Confidence</label>
       <input id="filterMinConf" type="number" min="0" max="1" step="0.05" placeholder="0.0">
@@ -1052,6 +1352,8 @@
           <th>Status</th>
           <th>Incident ID</th>
           <th>SKU</th>
+          <th>Store</th>
+          <th>Camera</th>
           <th>Confidence</th>
           <th>POS Match</th>
           <th>Reason</th>
@@ -1060,12 +1362,15 @@
         </tr>
       </thead>
       <tbody id="incidentRows">
-        <tr><td colspan="8" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents recorded yet. Run a demo to see the pipeline in action.</td></tr>
+        <tr><td colspan="10" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents recorded yet. Run a demo to see the pipeline in action.</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
+</div>
+
+<div class="workspace-panel" id="ws-intel">
 <!-- REASONING CHAIN -->
 <section id="reasoningSection" style="border-top: 1px solid rgba(255,255,255,0.06); background: radial-gradient(ellipse 60% 50% at 30% 0%, rgba(255,159,10,0.06), transparent);">
   <div class="section-label fade-in">Explainable AI</div>
@@ -1144,8 +1449,10 @@
   </div>
 </section>
 
+</div>
+
 <!-- KEYBOARD HINTS -->
-<div style="max-width:1200px;margin:0 auto;padding:0 40px 20px;">
+<div style="max-width:1400px;margin:0 auto;padding:0 28px 20px;">
   <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:16px 0;border-top:1px solid rgba(255,255,255,0.06);">
     <span style="font-size:11px;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-right:8px;">Keyboard Shortcuts</span>
     <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">D</kbd><span style="font-size:11px;color:#555;">Demo</span>
@@ -1155,6 +1462,10 @@
     <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">1</kbd><span style="font-size:11px;color:#555;">Speed</span>
     <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">2</kbd><span style="font-size:11px;color:#555;">Balanced</span>
     <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">3</kbd><span style="font-size:11px;color:#555;">Accuracy</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">4</kbd><span style="font-size:11px;color:#555;">Live</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">5</kbd><span style="font-size:11px;color:#555;">Cases</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">6</kbd><span style="font-size:11px;color:#555;">Intel</span>
+    <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">P</kbd><span style="font-size:11px;color:#555;">Pause pipeline</span>
     <kbd style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-size:11px;font-family:monospace;">Esc</kbd><span style="font-size:11px;color:#555;">Close Panel</span>
   </div>
 </div>
@@ -1167,6 +1478,8 @@
     <a href="https://github.com/Nickfuse21" target="_blank" rel="noopener noreferrer" style="color:#8cc8ff;text-decoration:none;">github.com/Nickfuse21</a>
   </p>
 </footer>
+
+</div>
 
 <aside class="incident-panel" id="incidentPanel" aria-live="polite">
   <div class="hd">
@@ -1181,8 +1494,9 @@
 <script>
   let totalFrames = 0;
   let cameraActive = false;
-  const metricState = { mTotal: 0, mEscalated: 0, mResolved: 0, mFrames: 0 };
-  const incidentFilters = { status: "", sku: "", min_confidence: "", review_status: "" };
+  const metricState = { mTotal: 0, mEscalated: 0, mResolved: 0, mFrames: 0, mUnreviewed: 0, mMismatch: 0, mHighRisk: 0 };
+  let latestHotSpots = [];
+  const incidentFilters = { status: "", sku: "", min_confidence: "", review_status: "", store_id: "", camera_id: "" };
   let latestIncidents = [];
   let lastAlertAt = "--";
   let lastFramesSnapshot = 0;
@@ -1190,6 +1504,8 @@
   let detectorLoopHandle = null;
   let detectorBusy = false;
   let detectorModelVariant = localStorage.getItem('detectorModelVariant') || 'pretrained';
+  let feedSimHandle = null;
+  let pipelinePaused = false;
   let workspaceMode = localStorage.getItem('workspaceMode') || 'analyst';
   let apiToken = localStorage.getItem('apiToken') || '';
   let copilotBusy = false;
@@ -1212,6 +1528,108 @@
     ctx: null,
     master: null,
   };
+  let lastIncidentIdSnapshot = new Set();
+
+  function showToast(message, variant = 'ok') {
+    const stack = document.getElementById('toastStack');
+    if (!stack) return;
+    const t = document.createElement('div');
+    t.className = `toast ${variant === 'err' ? 'err' : variant === 'warn' ? 'warn' : 'ok'}`;
+    t.textContent = message;
+    stack.appendChild(t);
+    setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translateY(8px)';
+      t.style.transition = 'opacity .35s ease, transform .35s ease';
+      setTimeout(() => t.remove(), 400);
+    }, 4200);
+  }
+
+  function updateDockSelectionFromIncident(item) {
+    const el = document.getElementById('dockSelection');
+    if (!el || !item) return;
+    el.innerHTML = `<strong style="color:#fff;">${item.incident_id}</strong><br>`
+      + `${item.observed_sku} · ${(Number(item.confidence) * 100).toFixed(0)}% conf<br>`
+      + `${item.status} · review: ${item.review_status || 'unreviewed'}<br>`
+      + `<span style="color:var(--text-secondary);">${item.store_id || '—'} / ${item.camera_id || '—'}</span>`;
+  }
+
+  function setWorkspaceTab(key) {
+    document.querySelectorAll('.workspace-panel').forEach((p) => {
+      p.classList.toggle('active', p.id === `ws-${key}`);
+    });
+    document.querySelectorAll('.workspace-tabs [data-workspace]').forEach((b) => {
+      const on = b.getAttribute('data-workspace') === key;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelectorAll(`#ws-${key} .fade-in:not(.visible)`).forEach((el) => {
+      el.classList.add('visible');
+    });
+    document.body.classList.remove('mobile-dock-open');
+  }
+
+  function initWorkspaceShell() {
+    document.querySelectorAll('.workspace-tabs [data-workspace]').forEach((btn) => {
+      btn.addEventListener('click', () => setWorkspaceTab(btn.getAttribute('data-workspace')));
+    });
+    document.getElementById('heroWatchFeed')?.addEventListener('click', () => {
+      setWorkspaceTab('live');
+      setTimeout(() => document.getElementById('liveFeedSection')?.scrollIntoView({ behavior: 'smooth' }), 100);
+    });
+  }
+
+  function initDockCollapse() {
+    const btn = document.getElementById('dockCollapseBtn');
+    if (localStorage.getItem('dockCollapsed') === '1') document.body.classList.add('dock-collapsed');
+    const syncDockBtn = () => {
+      if (!btn) return;
+      const c = document.body.classList.contains('dock-collapsed');
+      btn.textContent = c ? '⟨' : '⟩';
+      btn.setAttribute('aria-expanded', (!c).toString());
+    };
+    syncDockBtn();
+    btn?.addEventListener('click', () => {
+      document.body.classList.toggle('dock-collapsed');
+      localStorage.setItem('dockCollapsed', document.body.classList.contains('dock-collapsed') ? '1' : '0');
+      syncDockBtn();
+    });
+    document.getElementById('mobileDockBtn')?.addEventListener('click', () => {
+      document.body.classList.toggle('mobile-dock-open');
+    });
+  }
+
+  function initNvrToolbar() {
+    const box = document.getElementById('cameraBox');
+    const vid = document.getElementById('cameraFeed');
+    document.getElementById('nvrGrid')?.addEventListener('click', () => {
+      box?.classList.toggle('nvr-grid');
+      showToast(box?.classList.contains('nvr-grid') ? 'Alignment grid on' : 'Grid off', 'ok');
+    });
+    document.getElementById('nvrFs')?.addEventListener('click', async () => {
+      const target = box || vid;
+      if (!target) return;
+      try {
+        if (!document.fullscreenElement) {
+          await target.requestFullscreen();
+          box?.classList.add('nvr-fullscreen');
+        } else {
+          await document.exitFullscreen();
+          box?.classList.remove('nvr-fullscreen');
+        }
+      } catch {
+        showToast('Fullscreen not available in this browser', 'warn');
+      }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) box?.classList.remove('nvr-fullscreen');
+    });
+    document.getElementById('nvrSnap')?.addEventListener('click', () => {
+      showToast(`Marked @ ${new Date().toLocaleTimeString()}`, 'ok');
+      addLogLine(`MARK: operator note @ ${new Date().toISOString()}`, false);
+    });
+  }
 
   function authHeaders(extra = {}) {
     const headers = { ...extra };
@@ -1241,7 +1659,7 @@
       if (box) box.classList.add('feed-ready');
       cameraActive = true;
       document.getElementById('feedLabel').textContent = 'Live';
-      simulateContinuousFeed();
+      startFeedSimulation();
       startDetectionLoop();
     } catch {
       video.poster = '';
@@ -1249,20 +1667,62 @@
       if (box) box.classList.add('feed-ready');
       document.getElementById('feedLabel').textContent = 'Simulated';
       cameraActive = false;
-      simulateContinuousFeed();
+      startFeedSimulation();
       setDetectorStatus('Simulated mode: camera unavailable, detector idle.', 'N/A', 0);
     }
   }
 
-  // ── Continuous feed simulation ──
-  function simulateContinuousFeed() {
-    setInterval(async () => {
+  function liveSiteContext() {
+    const storeEl = document.getElementById('liveStoreId');
+    const camEl = document.getElementById('liveCameraId');
+    const store_id = (storeEl?.value || 'store-001').trim() || 'store-001';
+    const camera_id = (camEl?.value || 'cam-01').trim() || 'cam-01';
+    return { store_id, camera_id };
+  }
+
+  function setPipelinePaused(next) {
+    pipelinePaused = next;
+    const btn = document.getElementById('pipelinePauseBtn');
+    const lab = document.getElementById('pipelineStateLabel');
+    if (btn) {
+      btn.textContent = pipelinePaused ? 'Resume pipeline' : 'Pause pipeline';
+      btn.classList.toggle('paused', pipelinePaused);
+    }
+    if (lab) lab.textContent = pipelinePaused ? 'Observations: paused (no API posts)' : 'Observations: running';
+    if (pipelinePaused) {
+      if (detectorLoopHandle) {
+        clearInterval(detectorLoopHandle);
+        detectorLoopHandle = null;
+      }
+      const c = document.getElementById('detectionCanvas');
+      if (c) {
+        const ctx = c.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, c.width, c.height);
+      }
+      addLogLine('Pipeline paused by operator.', false);
+    } else if (cameraActive) {
+      startDetectionLoop();
+      addLogLine('Pipeline resumed.', false);
+    }
+  }
+
+  function togglePipelinePause() {
+    setPipelinePaused(!pipelinePaused);
+    playUiTone('refresh');
+  }
+
+  // ── Continuous feed simulation (vision observations) ──
+  function startFeedSimulation() {
+    if (feedSimHandle) clearInterval(feedSimHandle);
+    feedSimHandle = setInterval(async () => {
+      if (pipelinePaused) return;
       totalFrames++;
       document.getElementById('hudFrames').textContent = totalFrames;
       document.getElementById('mFrames').textContent = totalFrames;
       const isNormal = Math.random() > 0.08;
       const px = Math.min(1, Math.max(0, 0.3 + (Math.random()-0.5)*0.4));
       const py = Math.min(1, Math.max(0, 0.3 + (Math.random()-0.5)*0.4));
+      const { store_id, camera_id } = liveSiteContext();
       const payload = {
         source_frame_index: totalFrames,
         timestamp_utc: new Date().toISOString(),
@@ -1275,6 +1735,8 @@
         person_y: +py.toFixed(3),
         head_rotation_score: +(Math.random() * 0.4).toFixed(2),
         linger_seconds: isNormal ? +(Math.random()*8).toFixed(1) : +(10+Math.random()*20).toFixed(1),
+        store_id,
+        camera_id,
       };
       try {
         const res = await apiFetch('/vision/observations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -1284,7 +1746,7 @@
           triggerGlobalAlertFx();
           lastAlertAt = new Date().toLocaleTimeString();
           playUiTone('alert');
-          addLogLine(`ALERT: ${data.event.event_type} (conf=${data.event.confidence}) sku=${data.event.observed_sku}`, true);
+          addLogLine(`ALERT: ${data.event.event_type} (conf=${data.event.confidence}) sku=${data.event.observed_sku} @ ${store_id}/${camera_id}`, true);
           addAction(`Suspicious event detected. Querying POS...`, 'orange');
           setTimeout(() => addAction(`POS cross-check complete. Escalation decision made.`, 'accent'), 800);
         }
@@ -1336,14 +1798,14 @@
   }
 
   function startDetectionLoop() {
-    if (!cameraActive) return;
+    if (!cameraActive || pipelinePaused) return;
     if (detectorLoopHandle) clearInterval(detectorLoopHandle);
     const p = detectorProfiles[detectorProfileKey] || detectorProfiles.balanced;
     detectorLoopHandle = setInterval(runFrameDetection, p.intervalMs);
   }
 
   async function runFrameDetection() {
-    if (!cameraActive || detectorBusy) return;
+    if (!cameraActive || pipelinePaused || detectorBusy) return;
     const video = document.getElementById('cameraFeed');
     if (!video || !video.videoWidth || !video.videoHeight) return;
     detectorBusy = true;
@@ -1351,12 +1813,15 @@
       const capture = captureCurrentFrameBase64(video);
       if (!capture) return;
       const profile = detectorProfiles[detectorProfileKey] || detectorProfiles.balanced;
+      const slider = document.getElementById('detectorConfSlider');
+      const confFromSlider = slider ? Number(slider.value) / 100 : profile.confThreshold;
+      const conf_threshold = Math.min(0.95, Math.max(0.08, confFromSlider));
       const res = await apiFetch('/vision/detect-frame', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           image_base64: capture.imageBase64,
-          conf_threshold: profile.confThreshold,
+          conf_threshold,
           max_detections: profile.maxDetections,
           model_variant: detectorModelVariant,
         }),
@@ -1441,25 +1906,48 @@
       if (incidentFilters.sku) query.set('sku', incidentFilters.sku);
       if (incidentFilters.review_status) query.set('review_status', incidentFilters.review_status);
       if (incidentFilters.min_confidence !== "") query.set('min_confidence', incidentFilters.min_confidence);
-      const [metrics, incidents, events, behaviors, zones] = await Promise.all([
-        apiFetch('/metrics').then(r => r.json()),
+      if (incidentFilters.store_id) query.set('store_id', incidentFilters.store_id);
+      if (incidentFilters.camera_id) query.set('camera_id', incidentFilters.camera_id);
+      const mRes = await apiFetch('/metrics');
+      const cid = mRes.headers.get('X-Correlation-ID');
+      const corrEl = document.getElementById('sbCorrId');
+      if (cid && corrEl) {
+        corrEl.textContent = cid.length > 18 ? cid.slice(0, 8) + '…' : cid;
+        corrEl.title = cid;
+      }
+      const syncEl = document.getElementById('sbLastSync');
+      if (syncEl) syncEl.textContent = new Date().toLocaleTimeString();
+      const apiHealth = document.getElementById('sbApiHealth');
+      if (apiHealth) {
+        apiHealth.textContent = 'OK';
+        apiHealth.style.color = '';
+      }
+      const metrics = await mRes.json();
+      const [incidents, events, behaviors, zones, hotPayload] = await Promise.all([
         apiFetch('/incidents?' + query.toString()).then(r => r.json()),
         apiFetch('/vision/events').then(r => r.json()),
         apiFetch('/behavior/history').then(r => r.json()),
         apiFetch('/zones').then(r => r.json()),
+        apiFetch('/theft/hot-spots?top_n=6').then(r => r.json()).catch(() => ({ items: [] })),
       ]);
+      latestHotSpots = Array.isArray(hotPayload.items) ? hotPayload.items : [];
       animateMetric('mTotal', metrics.total_incidents);
       animateMetric('mEscalated', metrics.escalated_incidents);
       animateMetric('mResolved', metrics.resolved_incidents);
       animateMetric('mFrames', metrics.frames_processed || totalFrames);
+      animateMetric('mUnreviewed', metrics.unreviewed_incidents ?? 0);
+      animateMetric('mMismatch', metrics.pos_mismatch_incidents ?? 0);
+      animateMetric('mHighRisk', metrics.high_risk_unreviewed ?? 0);
       document.getElementById('hudEvents').textContent = events.length;
       document.getElementById('hudIncidents').textContent = metrics.total_incidents;
       latestIncidents = incidents;
       updateStatusBar(metrics);
+      document.querySelectorAll('.metric-card.metrics-skeleton').forEach((el) => el.classList.remove('metrics-skeleton'));
 
       const rows = document.getElementById('incidentRows');
       if (incidents.length === 0) {
-        rows.innerHTML = '<tr><td colspan="8" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents found with current filters.</td></tr>';
+        rows.innerHTML = '<tr><td colspan="10" style="color:var(--text-secondary);text-align:center;padding:40px;">No incidents found with current filters.</td></tr>';
+        lastIncidentIdSnapshot = new Set();
       } else {
         rows.innerHTML = '';
         for (const item of [...incidents].reverse().slice(0, 12)) {
@@ -1472,19 +1960,27 @@
           const tr = document.createElement('tr');
           tr.classList.add('incident-row');
           tr.setAttribute('data-incident-id', item.incident_id);
+          if (lastIncidentIdSnapshot.size > 0 && !lastIncidentIdSnapshot.has(item.incident_id)) {
+            tr.classList.add('row-flash');
+            setTimeout(() => tr.classList.remove('row-flash'), 2200);
+          }
+          const sid = item.store_id || '—';
+          const cidcam = item.camera_id || '—';
           tr.innerHTML = `
             <td><span class="pill ${cls}">${item.status.toUpperCase()}</span></td>
             <td style="font-family:monospace;font-size:12px;">${item.incident_id}</td>
             <td>${item.observed_sku}</td>
+            <td style="font-size:12px;color:var(--text-secondary);">${sid}</td>
+            <td style="font-size:12px;color:var(--text-secondary);">${cidcam}</td>
             <td>${item.confidence.toFixed(3)}</td>
             <td>${item.pos_match ? 'Yes' : 'No'}</td>
             <td style="color:var(--text-secondary);font-size:13px;">${item.behavior_pattern || '-'}</td>
             <td><span class="behavior-chip ${reviewCls}">${(item.review_status || 'unreviewed').replace('_',' ')}</span></td>
             <td>
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                <button class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:approve">Approve</button>
-                <button class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:false_positive">Dismiss</button>
-                <button class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:escalate_security">Escalate</button>
+                <button type="button" class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:approve">Approve</button>
+                <button type="button" class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:false_positive">Dismiss</button>
+                <button type="button" class="btn btn-outline" style="padding:6px 10px;font-size:11px;" data-review="${item.incident_id}:escalate_security">Escalate</button>
               </div>
             </td>
           `;
@@ -1500,7 +1996,9 @@
           });
         });
         rows.querySelectorAll('[data-review]').forEach((btn) => {
-          btn.addEventListener('click', async () => {
+          btn.addEventListener('click', async (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
             const [incidentId, action] = btn.getAttribute('data-review').split(':');
             const notes = window.prompt('Optional review notes:') || null;
             await apiFetch(`/incidents/${incidentId}/review`, {
@@ -1511,8 +2009,10 @@
             playUiTone('review');
             addAction(`Review action submitted: ${action} for ${incidentId}`, 'accent');
             await refreshAll();
+            showToast(`Review: ${action}`, 'ok');
           });
         });
+        lastIncidentIdSnapshot = new Set(incidents.map((i) => i.incident_id));
       }
 
       // Reasoning chain
@@ -1555,7 +2055,15 @@
       if (uiState.copilotAuto && Date.now() - copilotLastRefreshAt > 7000) {
         refreshCopilotBrief();
       }
-    } catch {}
+    } catch {
+      const apiHealth = document.getElementById('sbApiHealth');
+      if (apiHealth) {
+        apiHealth.textContent = 'Error';
+        apiHealth.style.color = 'var(--red)';
+      }
+      const dot = document.getElementById('sbDot');
+      if (dot) dot.classList.add('warn');
+    }
   }
 
   async function refreshCopilotBrief() {
@@ -1640,14 +2148,16 @@
 
   function updateStatusBar(metrics) {
     const escalated = Number(metrics.escalated_incidents || 0);
+    const unreviewed = Number(metrics.unreviewed_incidents || 0);
+    const attention = escalated > 0 || unreviewed > 0;
     const dot = document.getElementById('sbDot');
-    if (dot) dot.classList.toggle('warn', escalated > 0);
+    if (dot) dot.classList.toggle('warn', attention);
     const system = document.getElementById('sbSystem');
-    if (system) system.textContent = escalated > 0 ? 'Attention' : 'Online';
+    if (system) system.textContent = attention ? 'Attention' : 'Online';
     const alert = document.getElementById('sbLastAlert');
     if (alert) alert.textContent = lastAlertAt;
     const open = document.getElementById('sbOpenIncidents');
-    if (open) open.textContent = String(escalated);
+    if (open) open.textContent = unreviewed > 0 ? `${unreviewed} queue · ${escalated} esc` : String(escalated);
 
     const now = Date.now();
     const framesNow = Number(metrics.frames_processed || 0);
@@ -1750,6 +2260,7 @@
       : (item.reasoning_narrative || "-");
     body.innerHTML = `
       <div class="kv"><div class="k">Incident ID</div><div class="v">${item.incident_id}</div></div>
+      <div class="kv"><div class="k">Store / Camera</div><div class="v">${item.store_id || '—'} / ${item.camera_id || '—'}</div></div>
       <div class="kv"><div class="k">Status</div><div class="v">${item.status}</div></div>
       <div class="kv"><div class="k">SKU</div><div class="v">${item.observed_sku}</div></div>
       <div class="kv"><div class="k">Confidence</div><div class="v">${item.confidence}</div></div>
@@ -1760,6 +2271,7 @@
       <div class="kv"><div class="k">Clip Path</div><div class="v">${item.clip_path || "-"}</div></div>
       <div class="kv"><div class="k">Reasoning</div><div class="v">${chain}</div></div>
     `;
+    updateDockSelectionFromIncident(item);
     panel.classList.add('open');
     playUiTone('panelOpen');
   }
@@ -1807,7 +2319,7 @@
       return;
     }
     renderEvidencePanel(target);
-    renderIncidentAnalytics(incidents);
+    renderIncidentAnalytics(incidents, latestHotSpots);
   }
 
   function renderEvidencePanel(item) {
@@ -1819,6 +2331,7 @@
     evidence.innerHTML = `
       <div style="display:grid;grid-template-columns:100px 1fr;gap:6px 12px;">
         <span style="color:var(--text-secondary);">ID</span><span style="color:#fff;font-weight:600;word-break:break-all;">${item.incident_id}</span>
+        <span style="color:var(--text-secondary);">Site</span><span>${item.store_id || '-'} · ${item.camera_id || '-'}</span>
         <span style="color:var(--text-secondary);">Clip</span><span>${ep.clip_path || item.clip_path || '-'}</span>
         <span style="color:var(--text-secondary);">POS Match</span><span style="color:${item.pos_match ? 'var(--green)' : 'var(--red)'};">${item.pos_match ? 'Matched' : 'Mismatch'}</span>
         <span style="color:var(--text-secondary);">Detector</span><span>${ep.detector_snapshot?.event_type || '-'} (${((ep.detector_snapshot?.detector_confidence || 0)*100).toFixed(0)}%)</span>
@@ -1845,15 +2358,10 @@
     }
   }
 
-  function renderIncidentAnalytics(incidents) {
+  function renderIncidentAnalytics(incidents, hotSpots) {
     const el = document.getElementById('incidentAnalytics');
-    if (!el || !incidents.length) return;
-    const total = incidents.length;
-    const escalated = incidents.filter(i => i.status === 'escalated').length;
-    const reviewed = incidents.filter(i => i.review_status !== 'unreviewed').length;
-    const avgConf = incidents.reduce((s, i) => s + (i.confidence || 0), 0) / total;
-    const escalationPct = ((escalated / total) * 100).toFixed(1);
-    const reviewPct = ((reviewed / total) * 100).toFixed(1);
+    if (!el) return;
+    const spots = Array.isArray(hotSpots) ? hotSpots : [];
 
     function bar(label, pct, color) {
       return `<div>
@@ -1863,11 +2371,42 @@
         </div>
       </div>`;
     }
-    el.innerHTML =
-      bar('Escalation Rate', escalationPct, 'var(--red)') +
-      bar('Review Coverage', reviewPct, 'var(--green)') +
-      bar('Avg Confidence', (avgConf * 100).toFixed(1), 'var(--accent)') +
-      `<div style="font-size:11px;color:#555;margin-top:4px;">Based on ${total} incident${total !== 1 ? 's' : ''} in current session.</div>`;
+
+    const parts = [];
+    if (incidents.length) {
+      const total = incidents.length;
+      const escalated = incidents.filter(i => i.status === 'escalated').length;
+      const reviewed = incidents.filter(i => i.review_status !== 'unreviewed').length;
+      const avgConf = incidents.reduce((s, i) => s + (i.confidence || 0), 0) / total;
+      const escalationPct = ((escalated / total) * 100).toFixed(1);
+      const reviewPct = ((reviewed / total) * 100).toFixed(1);
+      parts.push(
+        bar('Escalation Rate', escalationPct, 'var(--red)'),
+        bar('Review Coverage', reviewPct, 'var(--green)'),
+        bar('Avg Confidence', (avgConf * 100).toFixed(1), 'var(--accent)'),
+        `<div style="font-size:11px;color:#555;margin-top:4px;">Based on ${total} incident${total !== 1 ? 's' : ''} in current feed.</div>`
+      );
+    }
+
+    if (spots.length) {
+      parts.push(
+        `<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">` +
+        `<div style="font-weight:700;color:#fff;margin-bottom:8px;font-size:12px;">Theft hot spots</div>` +
+        spots.map(h => {
+          const pri = h.priority_score != null ? h.priority_score : ((h.escalated_count || 0) + (h.unreviewed_count || 0));
+          return `<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:6px 0;">` +
+            `<span style="color:var(--text-secondary);">${h.store_id} · ${h.camera_id}</span>` +
+            `<span style="color:var(--orange);font-weight:600;">${pri} pri</span></div>`;
+        }).join('') +
+        `</div>`
+      );
+    }
+
+    if (!parts.length) {
+      el.textContent = 'Waiting for data...';
+      return;
+    }
+    el.innerHTML = parts.join('');
   }
 
   async function refreshSystemHealth() {
@@ -1910,9 +2449,13 @@
       } else if (ev.key === 'Escape') {
         const panel = document.getElementById('incidentPanel');
         if (panel) panel.classList.remove('open');
+        document.body.classList.remove('mobile-dock-open');
       } else if (ev.key === 'm' || ev.key === 'M') {
         ev.preventDefault();
         document.getElementById('soundToggle')?.click();
+      } else if (ev.key === 'p' || ev.key === 'P') {
+        ev.preventDefault();
+        togglePipelinePause();
       } else if (ev.key === '1') {
         ev.preventDefault();
         setDetectorProfile('speed');
@@ -1922,6 +2465,15 @@
       } else if (ev.key === '3') {
         ev.preventDefault();
         setDetectorProfile('accuracy');
+      } else if (ev.key === '4') {
+        ev.preventDefault();
+        setWorkspaceTab('live');
+      } else if (ev.key === '5') {
+        ev.preventDefault();
+        setWorkspaceTab('cases');
+      } else if (ev.key === '6') {
+        ev.preventDefault();
+        setWorkspaceTab('intel');
       }
     });
   }
@@ -1935,6 +2487,10 @@
       profileSelect.value = nextProfile;
     }
     const p = detectorProfiles[nextProfile];
+    const slid = document.getElementById('detectorConfSlider');
+    const dlab = document.getElementById('detectorConfLabel');
+    if (slid) slid.value = String(Math.round(p.confThreshold * 100));
+    if (dlab) dlab.textContent = `Confidence threshold (${nextProfile})`;
     addAction(`Detector profile switched to ${nextProfile.toUpperCase()} (interval ${p.intervalMs}ms, width ${p.maxInputWidth}).`, 'accent');
     setDetectorStatus(`Profile: ${nextProfile.toUpperCase()} | conf=${p.confThreshold}, maxDet=${p.maxDetections}`, document.getElementById('detectorDevice')?.textContent || 'unknown', Number(document.getElementById('detectorCount')?.textContent || 0));
     if (cameraActive) startDetectionLoop();
@@ -1948,7 +2504,33 @@
     profileSelect.addEventListener('change', () => {
       setDetectorProfile(profileSelect.value);
     });
+    const confSlider = document.getElementById('detectorConfSlider');
+    if (confSlider) {
+      confSlider.addEventListener('input', () => {
+        const dlab = document.getElementById('detectorConfLabel');
+        if (dlab) dlab.textContent = `Confidence threshold (${(Number(confSlider.value) / 100).toFixed(2)})`;
+      });
+    }
     setDetectorProfile(detectorProfileKey);
+  }
+
+  function initLiveWorkbench() {
+    const storeEl = document.getElementById('liveStoreId');
+    const camEl = document.getElementById('liveCameraId');
+    const pauseBtn = document.getElementById('pipelinePauseBtn');
+    if (storeEl) {
+      storeEl.value = localStorage.getItem('liveStoreId') || 'store-001';
+      const saveStore = () => localStorage.setItem('liveStoreId', storeEl.value.trim());
+      storeEl.addEventListener('change', saveStore);
+      storeEl.addEventListener('blur', saveStore);
+    }
+    if (camEl) {
+      camEl.value = localStorage.getItem('liveCameraId') || 'cam-01';
+      const saveCam = () => localStorage.setItem('liveCameraId', camEl.value.trim());
+      camEl.addEventListener('change', saveCam);
+      camEl.addEventListener('blur', saveCam);
+    }
+    pauseBtn?.addEventListener('click', togglePipelinePause);
   }
 
   function initDetectorModelControls() {
@@ -1990,18 +2572,6 @@
   }
 
   function initRightRailControls() {
-    const railToggleBtn = document.getElementById('railToggle');
-    const controlRail = document.getElementById('controlRail');
-    if (railToggleBtn && controlRail) {
-      const railOpen = localStorage.getItem('railOpen') === '1';
-      if (railOpen) controlRail.classList.add('rail-open');
-      railToggleBtn.addEventListener('click', () => {
-        const isOpen = controlRail.classList.toggle('rail-open');
-        localStorage.setItem('railOpen', isOpen ? '1' : '0');
-        railToggleBtn.style.color = isOpen ? 'var(--accent)' : '';
-      });
-      if (railOpen) railToggleBtn.style.color = 'var(--accent)';
-    }
     applyUiState();
     const modeEl = document.getElementById('workspaceMode');
     if (modeEl) {
@@ -2069,21 +2639,6 @@
       progress.style.width = ratio + '%';
       updateScrollLight(ratio);
     }, { passive: true });
-
-    // Active nav link based on visible section
-    const navLinks = Array.from(document.querySelectorAll('nav .links a'));
-    const sectionMap = navLinks
-      .map(a => ({ a, sec: document.querySelector(a.getAttribute('href')) }))
-      .filter(x => x.sec);
-    const navObserver = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        navLinks.forEach(l => l.classList.remove('active'));
-        const found = sectionMap.find(x => x.sec === e.target);
-        if (found) found.a.classList.add('active');
-      }
-    }, { threshold: 0.35 });
-    sectionMap.forEach(({ sec }) => navObserver.observe(sec));
 
     // Subtle tilt effect on cards
     const tiltTargets = document.querySelectorAll('.glass, .arch-node');
@@ -2177,6 +2732,8 @@
     setTimeout(() => addAction('Demo complete. Check incident feed below.', 'green'), 1500);
     await refreshAll();
     playUiTone('demoDone');
+    setWorkspaceTab('cases');
+    showToast('Demo complete — check Cases workspace for new incidents.', 'ok');
   }
 
   document.getElementById('heroDemo').addEventListener('click', runDemo);
@@ -2185,6 +2742,8 @@
     incidentFilters.sku = document.getElementById('filterSku').value.trim();
     incidentFilters.status = document.getElementById('filterStatus').value;
     incidentFilters.review_status = document.getElementById('filterReview').value;
+    incidentFilters.store_id = document.getElementById('filterStoreId').value.trim();
+    incidentFilters.camera_id = document.getElementById('filterCameraId').value.trim();
     incidentFilters.min_confidence = document.getElementById('filterMinConf').value;
     playUiTone('refresh');
     await refreshAll();
@@ -2204,6 +2763,10 @@
 
   // ── Init ──
   initSoundEngine();
+  initWorkspaceShell();
+  initDockCollapse();
+  initNvrToolbar();
+  initLiveWorkbench();
   initDetectorProfileControls();
   initDetectorModelControls();
   initCommandBarActions();

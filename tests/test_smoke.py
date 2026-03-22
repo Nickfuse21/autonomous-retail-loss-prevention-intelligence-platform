@@ -93,7 +93,31 @@ def test_demo_scenario_creates_dashboard_incident() -> None:
 
     metrics_response = client.get("/metrics")
     assert metrics_response.status_code == 200
-    assert metrics_response.json()["total_incidents"] >= 1
+    body = metrics_response.json()
+    assert body["total_incidents"] >= 1
+    for key in (
+        "unreviewed_incidents",
+        "pos_mismatch_incidents",
+        "high_risk_unreviewed",
+    ):
+        assert key in body
+
+    hot = client.get("/theft/hot-spots?top_n=3")
+    assert hot.status_code == 200
+    items = hot.json()["items"]
+    assert isinstance(items, list)
+    assert len(items) >= 1
+    assert "store_id" in items[0] and "camera_id" in items[0]
+
+
+def test_health_describes_theft_product() -> None:
+    client = TestClient(agent_app)
+    r = client.get("/health")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["product"] == "theft-detection"
+    assert "capabilities" in data
+    assert "theft_hot_spots" in data["capabilities"]
 
 
 def test_copilot_brief_and_chat_endpoints() -> None:

@@ -75,7 +75,12 @@ flowchart LR
 ## Visual dashboard
 
 Open `http://localhost:8080/` to access a polished operations dashboard with:
+- **Command-center UI:** workspace tabs (Live / Cases / Intel), fixed right operator dock (collapsible), NVR-style feed controls (grid, fullscreen, snapshot), and enterprise dark theme
 - Live camera/simulated feed with detection HUD
+- **Site context:** store/camera IDs on each observation (persisted on incidents + filterable in the incident feed)
+- **Pipeline control:** pause/resume vision observation posts and YOLO calls (keyboard `P`)
+- **Detector tuning:** live confidence threshold slider (syncs with speed/balanced/accuracy profiles)
+- Status bar: last sync time, last API **correlation ID** (support/debug), and API health
 - Live object-detection overlays (bounding boxes + labels) on camera layout
 - Incident metrics and real-time event stream
 - Explainable reasoning chain panel (latest verdict with steps)
@@ -198,10 +203,12 @@ Demo endpoints:
 - `POST /copilot/chat` ask copilot natural-language questions
 - `GET /incidents` processed incident objects
 - `GET /incidents/{incident_id}/evidence` export JSON evidence bundle
-- `GET /metrics` dashboard counters
+- `GET /metrics` dashboard counters (includes **review queue**, **POS mismatch**, **high-risk unreviewed**)
+- `GET /theft/hot-spots` ranked store/camera pairs for ops (escalations + open reviews)
 - `GET /metrics/extended` endpoint-latency and API config telemetry
 - `GET /behavior/history` recent micro-behavior signals
 - `GET /zones` store layout and zone metadata
+- `GET /health` service status, `product: theft-detection`, version, capabilities
 - `GET /health/dependencies` detector/copilot/dependency health details
 
 ## Agentic Copilot (Ollama + FastAPI)
